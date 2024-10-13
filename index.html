@@ -128,8 +128,8 @@
               </div>
       
               <button id="checkAvailability">ตรวจสอบที่ว่าง</button width: 100%>
-              <p id="availabilityMessage"></p>
-              <p id="occupancyMessage">จำนวนคนลงรถโดยสาร: 0 คน</p>
+              
+                <p id="occupancyMessage">จำนวนคนลงรถโดยสาร: 0 คน</p>
           </main>
       
           <script>
@@ -181,26 +181,7 @@
           <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>QR Code Integration</title>
-              <style>
-                  body {
-                      display: flex;
-                      justify-content: center;
-                      align-items: center;
-                      height: 100vh;
-                      background-color: #f0f0f0;
-                      font-family: Arial, sans-serif;
-                  }
-                  #qr-container {
-                      text-align: center;
-                  }
-              </style>
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>QR Code Passenger Counter</title>
+              <title>Bus Seat Management</title>
               <style>
                   body {
                       display: flex;
@@ -211,70 +192,65 @@
                       background-color: #f0f0f0;
                       font-family: Arial, sans-serif;
                   }
-                  #qr-container {
+                  #container {
                       text-align: center;
                   }
-              </style> 
-              <!DOCTYPE html>
-              <html lang="en">
-              <head>
-                  <meta charset="UTF-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <title>การใช้บริการรถโดยสาร/title>
-                  <style>
-                      body {
-                          display: flex;
-                          flex-direction: column;
-                          justify-content: center;
-                          align-items: center;
-                          height: 100vh;
-                          background-color: #f0f0f0;
-                          font-family: Arial, sans-serif;
-                      }
-                      #qr-container {
-                          text-align: center;
-                      }
-                  </style>
-              </head>
-              <body>
-                  <div id="qr-container">
-                      <h1>Scan this QR Code!</h1>
-                      <a id="qr-link" border="0" style="cursor:pointer;display:block">
-                          <img src="https://cdn2.me-qr.com/qr/29953992.png?v=1728817613" alt="Create qr code for free">
-                      </a>
-                      <p>Number of Passengers: <span id="passenger-count">0</span></p>
-                  </div>
-              
-                  <script>
-                      // ตัวแปรนับจำนวนผู้โดยสาร
-                      let passengerCount = 0;
-              
-                      // กำหนด URL ที่ต้องการเชื่อมโยง
-                      var myLink = "https://graceful-swan-3b163b.netlify.app/"; // เปลี่ยนเป็น URL ที่ต้องการ
-              
-                      // หาป้าย 'a' โดยใช้ ID และตั้งค่า href ให้เป็น URL ที่ต้องการ
-                      document.getElementById('qr-link').href = myLink;
-              
-                      // ฟังก์ชันสำหรับนับจำนวนผู้โดยสาร
-                      function countPassenger() {
-                          passengerCount++;
-                          document.getElementById('passenger-count').textContent = passengerCount;
-                          alert("Passenger counted! Total: " + passengerCount);
-                      }
-              
-                      // เพิ่ม event listener เมื่อคลิก QR code
-                      document.getElementById('qr-link').addEventListener('click', function(event) {
-                          event.preventDefault(); // ป้องกันการนำทางทันที
-                          countPassenger(); // เรียกใช้ฟังก์ชันนับผู้โดยสาร
-                          window.location.href = myLink; // นำทางหลังจากนับ
-                      });
-                  </script>
-              </body>
-              </html>
-              
-          
+                  button {
+                      padding: 10px 20px;
+                      font-size: 16px;
+                      margin-top: 20px;
+                  }
               </style>
-    
+          </head>
+          <body>
+              <div id="container">
+                  <h1>Available Seats: <span id="available-seats">10</span></h1>
+                  <a id="qr-link" border="0" style="cursor:pointer;display:block">
+                      <img src="https://cdn2.me-qr.com/qr/129953992.png?v=1728817613" alt="QR Code">
+                  </a>
+                  <p>Scan the QR code to board the bus.</p>
+                  <button id="leave-bus">Leave Bus</button>
+              </div>
+          
+              <script>
+                  // ตั้งค่าจำนวนที่นั่งเริ่มต้น
+                  let availableSeats = 10;
+          
+                  // แสดงจำนวนที่นั่งเริ่มต้นในหน้าเว็บ
+                  document.getElementById('available-seats').textContent = availableSeats;
+          
+                  // ฟังก์ชันลดจำนวนที่นั่งเมื่อสแกน QR code
+                  function reduceSeat() {
+                      if (availableSeats > 0) {
+                          availableSeats--;
+                          document.getElementById('available-seats').textContent = availableSeats;
+                          alert("Boarding the bus. Seats left: " + availableSeats);
+                      } else {
+                          alert("No seats available!");
+                      }
+                  }
+          
+                  // ฟังก์ชันเพิ่มจำนวนที่นั่งเมื่อกดปุ่ม 'Leave Bus'
+                  function increaseSeat() {
+                      availableSeats++;
+                      document.getElementById('available-seats').textContent = availableSeats;
+                      alert("Leaving the bus. Seats left: " + availableSeats);
+                  }
+          
+                  // จับการคลิก QR code (เปรียบเสมือนการสแกน)
+                  document.getElementById('qr-link').addEventListener('click', function(event) {
+                      event.preventDefault(); // ป้องกันการนำทาง
+                      reduceSeat(); // เรียกใช้ฟังก์ชันลดที่นั่ง
+                  });
+          
+                  // จับการคลิกปุ่ม 'Leave Bus'
+                  document.getElementById('leave-bus').addEventListener('click', function() {
+                      increaseSeat(); // เรียกใช้ฟังก์ชันเพิ่มที่นั่ง
+                  });
+              </script>
+          </body>
+          </html>
+          
                     
       </body>
       </html>
