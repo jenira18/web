@@ -214,42 +214,64 @@
                   #qr-container {
                       text-align: center;
                   }
-              </style> style='cursor:default;display:none'>Create qr code for free</a>
-          </head>
-          <body>
-              <div id="qr-container">
-                  <h1>Scan this QR Code!</h1>
-                  <a id="qr-link" border="0" style="cursor:pointer;display:block">
-                      <img src="https://me-qr.com'/qr/129953992.png?v=1728817613" alt="Create qr code for free'></a><a
-                  <p>Number of Passengers: <span id="passenger-count">0</span></p>
-              </div>
-          
-              <script>
-                  // ตัวแปรนับจำนวนผู้โดยสาร
-                  let passengerCount = 0;
-          
-                  // กำหนด URL ที่ต้องการเชื่อมโยง
-                  var myLink = "https://graceful-swan-3b163b.netlify.app/' "; // เปลี่ยนเป็น URL ที่ต้องการ
-          
-                  // หาป้าย 'a' โดยใช้ ID และตั้งค่า href ให้เป็น URL ที่ต้องการ
-                  document.getElementById('https://me-qr.com').href = myLink;
-          
-                  // ฟังก์ชันสำหรับนับจำนวนผู้โดยสาร
-                  function countPassenger() {
-                      passengerCount++;
-                      document.getElementById('passenger-count').textContent = passengerCount;
-                      alert("Passenger counted! Total: " + passengerCount);
-                  }
-          
-                  // เพิ่ม event listener เมื่อคลิก QR code
-                  document.getElementById('https://me-qr.com').addEventListener('click', function(event) {
-                      event.preventDefault(); // ป้องกันการนำทางทันที
-                      countPassenger(); // เรียกใช้ฟังก์ชันนับผู้โดยสาร
-                      window.location.href = myLink; // นำทางหลังจากนับ
-                  });
-              </script>
-          </body>
-          </html>
+              </style> 
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>การใช้บริการรถโดยสาร/title>
+                  <style>
+                      body {
+                          display: flex;
+                          flex-direction: column;
+                          justify-content: center;
+                          align-items: center;
+                          height: 100vh;
+                          background-color: #f0f0f0;
+                          font-family: Arial, sans-serif;
+                      }
+                      #qr-container {
+                          text-align: center;
+                      }
+                  </style>
+              </head>
+              <body>
+                  <div id="qr-container">
+                      <h1>Scan this QR Code!</h1>
+                      <a id="qr-link" border="0" style="cursor:pointer;display:block">
+                          <img src="https://cdn2.me-qr.com/qr/29953992.png?v=1728817613" alt="Create qr code for free">
+                      </a>
+                      <p>Number of Passengers: <span id="passenger-count">0</span></p>
+                  </div>
+              
+                  <script>
+                      // ตัวแปรนับจำนวนผู้โดยสาร
+                      let passengerCount = 0;
+              
+                      // กำหนด URL ที่ต้องการเชื่อมโยง
+                      var myLink = "https://graceful-swan-3b163b.netlify.app/"; // เปลี่ยนเป็น URL ที่ต้องการ
+              
+                      // หาป้าย 'a' โดยใช้ ID และตั้งค่า href ให้เป็น URL ที่ต้องการ
+                      document.getElementById('qr-link').href = myLink;
+              
+                      // ฟังก์ชันสำหรับนับจำนวนผู้โดยสาร
+                      function countPassenger() {
+                          passengerCount++;
+                          document.getElementById('passenger-count').textContent = passengerCount;
+                          alert("Passenger counted! Total: " + passengerCount);
+                      }
+              
+                      // เพิ่ม event listener เมื่อคลิก QR code
+                      document.getElementById('qr-link').addEventListener('click', function(event) {
+                          event.preventDefault(); // ป้องกันการนำทางทันที
+                          countPassenger(); // เรียกใช้ฟังก์ชันนับผู้โดยสาร
+                          window.location.href = myLink; // นำทางหลังจากนับ
+                      });
+                  </script>
+              </body>
+              </html>
+              
           
               </style>
     
