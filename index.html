@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การใช้บริการรถโดยสาร มรพส.</title>
+</head>
+<body>
+    <image src="รูปปกเว็บ.png" Width="110%" 
+    
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0; 
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50; /* สีเขียว */
+            color: white; 
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049; /* สีเขียวเข้มเมื่อชี้ */
+        }
+    </style>
+
+    </script>
+       <!DOCTYPE html>
+       <html lang="th">
+       <head>
+           <meta charset="UTF-8">
+           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+           <title>ตรวจสอบที่นั่งในรถโดยสาร</title>
+           <style>
+               .seat {
+                   width: 100%;
+                   height: 100%;
+                   margin: 100%;
+                   display: inline-block;
+                   text-align: center;
+                   line-height: 100%;
+                   background-color: lightgray;
+                   border: 1px solid black;
+               }
+               .available {
+                   background-color: lightgreen;
+               }
+               .occupied {
+                   background-color: lightcoral;
+               }
+           </style>
+      <!DOCTYPE html>
+      <html lang="th">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>ตรวจสอบที่นั่งในรถโดยสาร</title>
+          <button id="checkoutPassenger">เช็คอินการลงรถโดยสาร</button>
+          <style>
+              .seat {
+                  width:100%;
+                  height: 100%;
+                  margin: 100%;
+                  display: inline-block;
+                  text-align: center;
+                  line-height: 100%;
+                  background-color: lightgray;
+                  border: 1px solid black;
+              }
+              .available {
+                  background-color: lightgreen;
+              }
+              .occupied {
+                  background-color: lightcoral;
+              }
+          </style>
+      <!DOCTYPE html>
+      <html lang="th">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>ตรวจสอบที่นั่งในรถโดยสาร</title>
+          <style>
+              .seat {
+                  width: 50px;
+                  height: 50px;
+                  margin: 10px;
+                  display: inline-block;
+                  text-align: center;
+                  line-height: 50px;
+                  background-color: lightgray;
+                  border: 1px solid black;
+              }
+              .available {
+                  background-color: lightgreen;
+              }
+              .occupied {
+                  background-color: lightcoral;
+              }
+          </style>
+      </head>
+      <body>
+          <main>
+              <h2>รถโดยสาร 8 ที่นั่ง</h2>
+              <div id="seats">
+                  <div class="seat available" data-seat-number="1">1</div> 
+                  <div class="seat available" data-seat-number="2">2</div>
+                  <div class="seat available" data-seat-number="3">3</div>
+                  <div class="seat available" data-seat-number="4">4</div>
+                  <div class="seat available" data-seat-number="5">5</div>
+                  <div class="seat available" data-seat-number="6">6</div>
+                  <div class="seat available" data-seat-number="7">7</div>
+                  <div class="seat available" data-seat-number="8">8</div>
+              </div>
+      
+              <button id="checkAvailability">ตรวจสอบที่ว่าง</button width: 100%>
+              <p id="availabilityMessage"></p>
+              <p id="occupancyMessage">จำนวนคนลงรถโดยสาร: 0 คน</p>
+          </main>
+      
+          <script>
+              let seatsStatus = [false, false, false, false, false, false, false, false]; // สถานะของที่นั่งทุกที่ว่าง
+              let passengersCheckedOut = 0;
+      
+              // ฟังก์ชันอัปเดตสถานะที่นั่งในหน้าจอ
+              function updateSeatsDisplay() {
+                  const seats = document.querySelectorAll('.seat');
+                  seats.forEach((seat, index) => {
+                      if (seatsStatus[index]) {
+                          seat.classList.remove('available');
+                          seat.classList.add('occupied');
+                      } else {
+                          seat.classList.remove('occupied');
+                          seat.classList.add('available');
+                      }
+                  });
+              }
+      
+              // ฟังก์ชันนับที่ว่าง
+              function countAvailableSeats() {
+                  return seatsStatus.filter(status => !status).length;
+              }
+      
+              // ฟังก์ชันตรวจสอบที่ว่างเมื่อกดปุ่ม
+              document.getElementById('checkAvailability').addEventListener('click', function() {
+                  const availableSeatsCount = countAvailableSeats();
+                  document.getElementById('availabilityMessage').textContent = `มีที่ว่าง ${availableSeatsCount} ที่`;
+              });
+      
+              // ฟังก์ชันจำลองการลงรถและอัปเดตสถานะที่นั่ง
+              document.getElementById('checkoutPassenger').addEventListener('click', function() {
+                  for (let i = 0; i < seatsStatus.length; i++) {
+                      if (seatsStatus[i] === true) { // หากที่นั่งเต็ม
+                          seatsStatus[i] = false; // ทำให้ที่นั่งนั้นว่าง
+                          passengersCheckedOut++; // เพิ่มจำนวนคนลงรถ
+                          document.getElementById('occupancyMessage').textContent = `จำนวนคนลงรถโดยสาร: ${passengersCheckedOut} คน`;
+                          updateSeatsDisplay(); // อัปเดตสถานะที่นั่งในหน้าจอ
+                          break; // ลงที่นั่งหนึ่งคนแล้วออกจากลูป
+                      }
+                  }
+              });
+      
+              updateSeatsDisplay(); // เรียกใช้งานครั้งแรกเพื่ออัปเดตหน้าจอ
+          </script>
+      </body>
+      </html>
+      
