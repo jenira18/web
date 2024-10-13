@@ -36,222 +36,100 @@
         button:hover {
             background-color: #45a049; /* สีเขียวเข้มเมื่อชี้ */
         }
+    </style> <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Seat Management</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #timestamp {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
     </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Bus Seat Management</h1>
+        <h2>Available Seats: <span id="available-seats">8</span></h2>
+        <p>Scan QR code to board the bus. Seats will decrease automatically.</p>
+        <img src="https://cdn2.me-qr.com/qr/129953992.png?v=1728817583" alt="QR Code" width="200" height="200">
+        <button id="Scan">ลงจากรถโดยสาร</button>
+        <div id="timestamp"></div>
+    </div>
 
+    <script>
+        // จำนวนที่นั่งเริ่มต้น
+        let availableSeats = 8;
+
+        // แสดงจำนวนที่นั่งเริ่มต้น
+        document.getElementById('available-seats').textContent = availableSeats;
+
+        // ฟังก์ชันลดที่นั่งเมื่อมีการสแกน QR code
+        function reduceSeat() {
+            if (availableSeats > 0) {
+                availableSeats--;
+                document.getElementById('available-seats').textContent = availableSeats;
+                const timestamp = new Date();
+                document.getElementById('timestamp').textContent = "Boarding time: " + timestamp.toLocaleString();
+                alert("Boarding the bus. Seats left: " + availableSeats);
+            } else {
+                alert("No seats available!");
+            }
+        }
+
+        // ฟังก์ชันเพิ่มที่นั่งเมื่อกดปุ่มลงจากรถ
+        function increaseSeat() {
+            if (availableSeats < 8) {
+                availableSeats++;
+                document.getElementById('available-seats').textContent = availableSeats;
+                alert("Leaving the bus. Seats left: " + availableSeats);
+            } else {
+                alert("The bus is empty.");
+            }
+        }
+
+        // ฟังก์ชันจำลองการสแกน QR code ผ่านมือถือ
+        function simulateQRCodeScan() {
+            reduceSeat();
+        }
+
+        // จับการคลิกที่ปุ่ม 'Leave Bus'
+        document.getElementById('leave-bus').addEventListener('click', function() {
+            increaseSeat();
+        });
+
+        // ฟังก์ชันนี้จะทำงานเมื่อผู้ใช้สแกน QR code
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('scanned')) {
+                simulateQRCodeScan(); // จำลองการสแกน QR code โดยตรวจสอบพารามิเตอร์ URL
+            }
+        };
     </script>
-       <!DOCTYPE html>
-       <html lang="th">
-       <head>
-           <meta charset="UTF-8">
-           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-           <title>ตรวจสอบที่นั่งในรถโดยสาร</title>
-           <style>
-               .seat {
-                   width: 100%;
-                   height: 100%;
-                   margin: 100%;
-                   display: inline-block;
-                   text-align: center;
-                   line-height: 100%;
-                   background-color: lightgray;
-                   border: 1px solid black;
-               }
-               .available {
-                   background-color: lightgreen;
-               }
-               .occupied {
-                   background-color: lightcoral;
-               }
-           </style>
-      <!DOCTYPE html>
-      <html lang="th">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>ตรวจสอบที่นั่งในรถโดยสาร</title>
-          <button id="checkoutPassenger">เช็คอินการลงรถโดยสาร</button>
-          <style>
-              .seat {
-                  width:100%;
-                  height: 100%;
-                  margin: 100%;
-                  display: inline-block;
-                  text-align: center;
-                  line-height: 100%;
-                  background-color: lightgray;
-                  border: 1px solid black;
-              }
-              .available {
-                  background-color: lightgreen;
-              }
-              .occupied {
-                  background-color: lightcoral;
-              }
-          </style>
-      <!DOCTYPE html>
-      <html lang="th">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>ตรวจสอบที่นั่งในรถโดยสาร</title>
-          <style>
-              .seat {
-                  width: 50px;
-                  height: 50px;
-                  margin: 10px;
-                  display: inline-block;
-                  text-align: center;
-                  line-height: 50px;
-                  background-color: lightgray;
-                  border: 1px solid black;
-              }
-              .available {
-                  background-color: lightgreen;
-              }
-              .occupied {
-                  background-color: lightcoral;
-              }
-          </style>
-      </head>
-      <body>
-          <main>
-              <h2>รถโดยสาร 8 ที่นั่ง</h2>
-              <div id="seats">
-                  <div class="seat available" data-seat-number="1">1</div> 
-                  <div class="seat available" data-seat-number="2">2</div>
-                  <div class="seat available" data-seat-number="3">3</div>
-                  <div class="seat available" data-seat-number="4">4</div>
-                  <div class="seat available" data-seat-number="5">5</div>
-                  <div class="seat available" data-seat-number="6">6</div>
-                  <div class="seat available" data-seat-number="7">7</div>
-                  <div class="seat available" data-seat-number="8">8</div>
-              </div>
-      
-              <button id="checkAvailability">ตรวจสอบที่ว่าง</button width: 100%>
-              
-                <p id="occupancyMessage">จำนวนคนลงรถโดยสาร: 0 คน</p>
-          </main>
-      
-          <script>
-              let seatsStatus = [false, false, false, false, false, false, false, false]; // สถานะของที่นั่งทุกที่ว่าง
-              let passengersCheckedOut = 0;
-      
-              // ฟังก์ชันอัปเดตสถานะที่นั่งในหน้าจอ
-              function updateSeatsDisplay() {
-                  const seats = document.querySelectorAll('.seat');
-                  seats.forEach((seat, index) => {
-                      if (seatsStatus[index]) {
-                          seat.classList.remove('available');
-                          seat.classList.add('occupied');
-                      } else {
-                          seat.classList.remove('occupied');
-                          seat.classList.add('available');
-                      }
-                  });
-              }
-      
-              // ฟังก์ชันนับที่ว่าง
-              function countAvailableSeats() {
-                  return seatsStatus.filter(status => !status).length;
-              }
-      
-              // ฟังก์ชันตรวจสอบที่ว่างเมื่อกดปุ่ม
-              document.getElementById('checkAvailability').addEventListener('click', function() {
-                  const availableSeatsCount = countAvailableSeats();
-                  document.getElementById('availabilityMessage').textContent = `มีที่ว่าง ${availableSeatsCount} ที่`;
-              });
-      
-              // ฟังก์ชันจำลองการลงรถและอัปเดตสถานะที่นั่ง
-              document.getElementById('checkoutPassenger').addEventListener('click', function() {
-                  for (let i = 0; i < seatsStatus.length; i++) {
-                      if (seatsStatus[i] === true) { // หากที่นั่งเต็ม
-                          seatsStatus[i] = false; // ทำให้ที่นั่งนั้นว่าง
-                          passengersCheckedOut++; // เพิ่มจำนวนคนลงรถ
-                          document.getElementById('occupancyMessage').textContent = `จำนวนคนลงรถโดยสาร: ${passengersCheckedOut} คน`;
-                          updateSeatsDisplay(); // อัปเดตสถานะที่นั่งในหน้าจอ
-                          break; // ลงที่นั่งหนึ่งคนแล้วออกจากลูป
-                      }
-                  }
-              });
-      
-              updateSeatsDisplay(); // เรียกใช้งานครั้งแรกเพื่ออัปเดตหน้าจอ
-          </script>
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Bus Seat Management</title>
-              <style>
-                  body {
-                      display: flex;
-                      flex-direction: column;
-                      justify-content: center;
-                      align-items: center;
-                      height: 100vh;
-                      background-color: #f0f0f0;
-                      font-family: Arial, sans-serif;
-                  }
-                  #container {
-                      text-align: center;
-                  }
-                  button {
-                      padding: 10px 20px;
-                      font-size: 16px;
-                      margin-top: 20px;
-                  }
-              </style>
-          </head>
-          <body>
-              <div id="container">
-                  <h1>Available Seats: <span id="available-seats">0</span></h1>
-                  <a id="qr-link" border="0" style="cursor:pointer;display:block">
-                      <img src="https://cdn2.me-qr.com/qr/129953992.png?v=1728817613" alt="QR Code">
-                  </a>
-                  <p>Scan the QR code to board the bus.</p>
-                  <button id="leave-bus">Leave Bus</button>
-              </div>
-          
-              <script>
-                  // ตั้งค่าจำนวนที่นั่งเริ่มต้น
-                  let availableSeats = 8;
-          
-                  // แสดงจำนวนที่นั่งเริ่มต้นในหน้าเว็บ
-                  document.getElementById('available-seats').textContent = availableSeats;
-          
-                  // ฟังก์ชันลดจำนวนที่นั่งเมื่อสแกน QR code
-                  function reduceSeat() {
-                      if (availableSeats > 0) {
-                          availableSeats--;
-                          document.getElementById('available-seats').textContent = availableSeats;
-                          alert("Boarding the bus. Seats left: " + availableSeats);
-                      } else {
-                          alert("No seats available!");
-                      }
-                  }
-          
-                  // ฟังก์ชันเพิ่มจำนวนที่นั่งเมื่อกดปุ่ม 'Leave Bus'
-                  function increaseSeat() {
-                      availableSeats++;
-                      document.getElementById('available-seats').textContent = availableSeats;
-                      alert("Leaving the bus. Seats left: " + availableSeats);
-                  }
-          
-                  // จับการคลิก QR code (เปรียบเสมือนการสแกน)
-                  document.getElementById('qr-link').addEventListener('Scan', function(event) {
-                      event.preventDefault(); // ป้องกันการนำทาง
-                      reduceSeat(); // เรียกใช้ฟังก์ชันลดที่นั่ง
-                  });
-          
-                  // จับการคลิกปุ่ม 'Leave Bus'
-                  document.getElementById('leave-bus').addEventListener('Scan', function() {
-                      increaseSeat(); // เรียกใช้ฟังก์ชันเพิ่มที่นั่ง
-                  });
-              </script>
-          </body>
-          </html>
-          
-                    
+</body>
+</html>
+
       </body>
       </html>
       
