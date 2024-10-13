@@ -8,7 +8,7 @@
 <body>
     <image src="รูปปกเว็บ.png" Width="110%" 
     
-<html lang="en">
+    <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,6 +176,48 @@
       
               updateSeatsDisplay(); // เรียกใช้งานครั้งแรกเพื่ออัปเดตหน้าจอ
           </script>
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>QR Code Integration</title>
+              <style>
+                  body {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      height: 100vh;
+                      background-color: #f0f0f0;
+                      font-family: Arial, sans-serif;
+                  }
+                  #qr-container {
+                      text-align: center;
+                  }
+              </style>
+          </head>
+          <body>
+              <div id="qr-container">
+                  <h1>Scan this QR Code!</h1>
+                  <a id="qr-link" border="0" style="cursor:pointer;display:block">
+                      <img src="qr code.png" alt="QR Code">
+                  </a>
+                  <p>Click the QR code or scan it to visit the link.</p>
+              </div>
+          
+              <script>
+                  // กำหนด URL ที่ต้องการเชื่อมโยง
+                  var myLink = "https://me-qr.com' border"; // เปลี่ยนเป็น URL ที่ต้องการ
+          
+                  // หาป้าย 'a' โดยใช้ ID และตั้งค่า href ให้เป็น URL ที่ต้องการ
+                  document.getElementById('qr-link').href = myLink;
+          
+                  // ถ้าต้องการให้มีการแจ้งเตือนเมื่อคลิก QR code
+                  document.getElementById('qr-link').addEventListener('click', function() {
+                      alert("QR code clicked! Redirecting to " + myLink);
+                  });
+              </script>
+         
       </body>
       </html>
       
