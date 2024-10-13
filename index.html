@@ -204,7 +204,7 @@
           </head>
           <body>
               <div id="container">
-                  <h1>Available Seats: <span id="available-seats">10</span></h1>
+                  <h1>Available Seats: <span id="available-seats">0</span></h1>
                   <a id="qr-link" border="0" style="cursor:pointer;display:block">
                       <img src="https://cdn2.me-qr.com/qr/129953992.png?v=1728817613" alt="QR Code">
                   </a>
@@ -214,7 +214,7 @@
           
               <script>
                   // ตั้งค่าจำนวนที่นั่งเริ่มต้น
-                  let availableSeats = 10;
+                  let availableSeats = 8;
           
                   // แสดงจำนวนที่นั่งเริ่มต้นในหน้าเว็บ
                   document.getElementById('available-seats').textContent = availableSeats;
@@ -238,13 +238,13 @@
                   }
           
                   // จับการคลิก QR code (เปรียบเสมือนการสแกน)
-                  document.getElementById('qr-link').addEventListener('click', function(event) {
+                  document.getElementById('qr-link').addEventListener('Scan', function(event) {
                       event.preventDefault(); // ป้องกันการนำทาง
                       reduceSeat(); // เรียกใช้ฟังก์ชันลดที่นั่ง
                   });
           
                   // จับการคลิกปุ่ม 'Leave Bus'
-                  document.getElementById('leave-bus').addEventListener('click', function() {
+                  document.getElementById('leave-bus').addEventListener('Scan', function() {
                       increaseSeat(); // เรียกใช้ฟังก์ชันเพิ่มที่นั่ง
                   });
               </script>
