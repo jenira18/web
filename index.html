@@ -36,100 +36,77 @@
         button:hover {
             background-color: #45a049; /* สีเขียวเข้มเมื่อชี้ */
         }
-    </style> <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bus Seat Management</title>
-    <style>
+        </style> 
+            <!DOCTYPE html>
+            <html lang="th">
+            <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ระบบเช็คอินรถโดยสาร 8 ที่นั่ง</title>
+        <style>
         body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
-        }
-        #container {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh; }
+        .info {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         button {
             padding: 10px 20px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-        #timestamp {
-            margin-top: 20px;
             font-size: 18px;
-            color: #333;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>Bus Seat Management</h1>
-        <h2>Available Seats: <span id="available-seats">8</span></h2>
-        <p>Scan QR code to board the bus. Seats will decrease automatically.</p>
-        <img src="https://cdn2.me-qr.com/qr/129953992.png?v=1728817583" alt="QR Code" width="200" height="200">
-        <button id="Scan">ลงจากรถโดยสาร</button>
-        <div id="timestamp"></div>
-    </div>
+    <div class="info" id="seat-info">ที่นั่งว่าง: 8 ที่</div>
+    <div class="info" id="scan-time"></div>
+    <button id="checkout-button">เช็คอินลงจากรถโดยสาร</button>
 
     <script>
         // จำนวนที่นั่งเริ่มต้น
         let availableSeats = 8;
 
-        // แสดงจำนวนที่นั่งเริ่มต้น
-        document.getElementById('available-seats').textContent = availableSeats;
+        // อัปเดตการแสดงผลของที่นั่งว่าง
+        function updateSeatInfo() {
+            document.getElementById('seat-info').innerText = `ที่นั่งว่าง: ${availableSeats} ที่`;
+        }
 
-        // ฟังก์ชันลดที่นั่งเมื่อมีการสแกน QR code
-        function reduceSeat() {
+        // ฟังก์ชันจำลองการสแกน QR code
+        function scanQRCode() {
             if (availableSeats > 0) {
                 availableSeats--;
-                document.getElementById('available-seats').textContent = availableSeats;
-                const timestamp = new Date();
-                document.getElementById('timestamp').textContent = "Boarding time: " + timestamp.toLocaleString();
-                alert("Boarding the bus. Seats left: " + availableSeats);
+                updateSeatInfo();
+                let currentTime = new Date().toLocaleTimeString();
+                document.getElementById('scan-time').innerText = `QR Code สแกนล่าสุดเมื่อ: ${currentTime}`;
             } else {
-                alert("No seats available!");
+                alert("ที่นั่งเต็มแล้ว");
             }
         }
 
-        // ฟังก์ชันเพิ่มที่นั่งเมื่อกดปุ่มลงจากรถ
-        function increaseSeat() {
+        // ฟังก์ชันเมื่อกดปุ่มเช็คอินลงจากรถ
+        document.getElementById('checkout-button').addEventListener('click', function() {
             if (availableSeats < 8) {
                 availableSeats++;
-                document.getElementById('available-seats').textContent = availableSeats;
-                alert("Leaving the bus. Seats left: " + availableSeats);
+                updateSeatInfo();
             } else {
-                alert("The bus is empty.");
+                alert("ไม่มีผู้โดยสารที่ต้องลงจากรถ");
             }
-        }
-
-        // ฟังก์ชันจำลองการสแกน QR code ผ่านมือถือ
-        function simulateQRCodeScan() {
-            reduceSeat();
-        }
-
-        // จับการคลิกที่ปุ่ม 'Leave Bus'
-        document.getElementById('leave-bus').addEventListener('click', function() {
-            increaseSeat();
         });
 
-        // ฟังก์ชันนี้จะทำงานเมื่อผู้ใช้สแกน QR code
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('scanned')) {
-                simulateQRCodeScan(); // จำลองการสแกน QR code โดยตรวจสอบพารามิเตอร์ URL
-            }
-        };
+        // การเชื่อมต่อ QR Code กับการสแกน (สามารถเชื่อมกับ QR Code จริงผ่านระบบเซิร์ฟเวอร์)
+        function simulateQRScan() {
+            // โค้ดส่วนนี้จำลองการสแกน QR (คุณต้องเชื่อมต่อกับระบบ backend ที่จัดการ QR จริง)
+            scanQRCode();
+        }
+
+        // เรียกใช้ฟังก์ชัน simulateQRScan เมื่อได้รับการสแกน QR Code จริง (คุณสามารถใช้ API หรือระบบ backend ของคุณได้)
+        // เช่น เมื่อมีการสแกน QR จากระบบ backend แล้วส่งข้อมูลกลับมาที่หน้านี้
     </script>
 </body>
 </html>
 
-      </body>
-      </html>
       
