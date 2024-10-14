@@ -135,6 +135,7 @@
                      const timestamp = now.toLocaleString(); // เวลาและวันที่
                      checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
                      currentSeats++; // เพิ่มจำนวนที่นั่ง
+                     if (currentSeats > 8) currentSeats = 8; // ตรวจสอบไม่ให้เกิน 8 ที่นั่ง
                      checkedInCount--; // ลดจำนวนคนที่เช็คอิน
                      updateAvailableSeats();
      
@@ -155,24 +156,16 @@
              window.onload = function() {
                  updateAvailableSeats(); // อัปเดตจำนวนที่นั่งที่แสดงบนหน้าเว็บเมื่อโหลดเสร็จ
                  updateHistory(); // แสดงประวัติการเช็คอินและลงรถ
-             };
      
-             // ฟังก์ชันจำลองการสแกน QR Code (คุณสามารถแทนที่ด้วยการสแกนจริง)
-             function onQRCodeScanned() {
-                 addCheckIn(); // เรียกฟังก์ชันเช็คอินเมื่อมีการสแกน QR Code
-             }
+                 // เช็คอินโดยอัตโนมัติเมื่อสแกน QR Code และเข้าสู่หน้าเว็บ
+                 addCheckIn();
+             };
      
              // เพิ่มปุ่มลงรถ
              const getOffButton = document.createElement('button');
              getOffButton.innerText = 'ลงรถโดยสาร';
              getOffButton.onclick = addCheckOut; // เรียกฟังก์ชันลงรถเมื่อกดปุ่ม
              document.body.appendChild(getOffButton);
-     
-             // จำลองการสแกน QR Code เพื่อทดสอบ
-             const qrCodeButton = document.createElement('button');
-             qrCodeButton.innerText = 'สแกน QR Code';
-             qrCodeButton.onclick = onQRCodeScanned; // เรียกฟังก์ชันนี้เมื่อสแกน QR Code จริง
-             document.body.appendChild(qrCodeButton);
          </script>
      </body>
      </html>
