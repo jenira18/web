@@ -107,27 +107,24 @@
      
              // ฟังก์ชันเพิ่มการเช็คอินเมื่อสแกน QR Code
              function addCheckIn() {
-                 if (localStorage.getItem('lastCheckIn') !== new Date().toDateString()) { // ป้องกันการลดซ้ำเมื่อรีเฟรช
-                     if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
-                         const now = new Date();
-                         const timestamp = now.toLocaleString(); // เวลาและวันที่
-                         checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
-                         currentSeats--; // ลดจำนวนที่นั่ง
-                         checkedInCount++; // เพิ่มจำนวนคนที่เช็คอิน
-                         updateAvailableSeats();
+                 if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
+                     const now = new Date();
+                     const timestamp = now.toLocaleString(); // เวลาและวันที่
+                     checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
+                     currentSeats--; // ลดจำนวนที่นั่ง
+                     checkedInCount++; // เพิ่มจำนวนคนที่เช็คอิน
+                     updateAvailableSeats();
      
-                         // เก็บข้อมูลใน LocalStorage
-                         localStorage.setItem('currentSeats', currentSeats);
-                         localStorage.setItem('checkedInCount', checkedInCount);
-                         localStorage.setItem('lastCheckIn', now.toDateString()); // จดจำวันที่เช็คอินเพื่อป้องกันการลดซ้ำ
+                     // เก็บข้อมูลใน LocalStorage
+                     localStorage.setItem('currentSeats', currentSeats);
+                     localStorage.setItem('checkedInCount', checkedInCount);
      
-                         // บันทึกประวัติการเช็คอินใน LocalStorage
-                         const storedCheckInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
-                         storedCheckInHistory.push(timestamp);
-                         localStorage.setItem('checkInHistory', JSON.stringify(storedCheckInHistory));
-                     } else {
-                         alert('ไม่มีที่นั่งว่าง');
-                     }
+                     // บันทึกประวัติการเช็คอินใน LocalStorage
+                     const storedCheckInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
+                     storedCheckInHistory.push(timestamp);
+                     localStorage.setItem('checkInHistory', JSON.stringify(storedCheckInHistory));
+                 } else {
+                     alert('รถโดยสารเต็มแล้ว');
                  }
              }
      
@@ -159,9 +156,6 @@
              window.onload = function() {
                  updateAvailableSeats(); // อัปเดตจำนวนที่นั่งที่แสดงบนหน้าเว็บเมื่อโหลดเสร็จ
                  updateHistory(); // แสดงประวัติการเช็คอินและลงรถ
-     
-                 // เช็คอินโดยอัตโนมัติเมื่อสแกน QR Code และเข้าสู่หน้าเว็บ
-                 addCheckIn();
              };
      
              // เพิ่มปุ่มลงรถ
