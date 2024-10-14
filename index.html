@@ -51,23 +51,16 @@
                 #history {
                     margin-top: 20px;
                 }
-                button {
-                    margin: 10px 0;
-                    padding: 10px;
-                    font-size: 16px;
-                }
             </style>
         </head>
         <body>
             <h1>ระบบ QR Code ขึ้นรถ</h1>
             <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
-            
-            <button id="getOffButton">ลงรถโดยสาร</button>
-        
             <div id="history">
                 <h4>ประวัติการเช็คอิน:</h4>
                 <ul id="checkInHistory"></ul>
-                
+            </div>
+            <div id="getOffHistory">
                 <h4>ประวัติการลงรถ:</h4>
                 <ul id="checkOutHistory"></ul>
             </div>
@@ -76,74 +69,50 @@
                 const availableSeatsElement = document.getElementById('availableSeats');
                 const checkInHistory = document.getElementById('checkInHistory');
                 const checkOutHistory = document.getElementById('checkOutHistory');
-                const getOffButton = document.getElementById('getOffButton');
-                const maxSeats = 8;
-                let currentSeats = maxSeats;
         
-                // โหลดข้อมูลเมื่อหน้าโหลด
-                window.onload = function() {
-                    // โหลดประวัติจาก Local Storage
-                    loadHistory();
-                    // อัปเดตจำนวนที่นั่ง
-                    updateAvailableSeats();
-                };
+                let currentSeats = 8; // จำนวนที่นั่งสูงสุด
         
-                // ฟังก์ชันสำหรับเพิ่มประวัติการเช็คอิน
+                // ฟังก์ชันเพิ่มการเช็คอิน
                 function addCheckIn() {
                     const now = new Date();
                     const timestamp = now.toLocaleString(); // เวลาและวันที่
                     checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
-                    currentSeats--;
+                    currentSeats--; // ลดจำนวนที่นั่ง
                     updateAvailableSeats();
-                    saveHistory(); // บันทึกประวัติ
                 }
         
-                // ฟังก์ชันสำหรับเพิ่มประวัติการลงรถ
+                // ฟังก์ชันเพิ่มการลงรถ
                 function addCheckOut() {
                     const now = new Date();
                     const timestamp = now.toLocaleString(); // เวลาและวันที่
                     checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
-                    currentSeats++;
+                    currentSeats++; // เพิ่มจำนวนที่นั่ง
                     updateAvailableSeats();
-                    saveHistory(); // บันทึกประวัติ
                 }
         
-                // อัปเดตจำนวนที่นั่ง
+                // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
                 function updateAvailableSeats() {
                     availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
                 }
         
-                // บันทึกประวัติใน Local Storage
-                function saveHistory() {
-                    const checkInData = checkInHistory.innerHTML;
-                    const checkOutData = checkOutHistory.innerHTML;
-                    localStorage.setItem('checkInHistory', checkInData);
-                    localStorage.setItem('checkOutHistory', checkOutData);
-                    localStorage.setItem('availableSeats', currentSeats);
-                }
-        
-                // โหลดประวัติจาก Local Storage
-                function loadHistory() {
-                    const savedCheckInHistory = localStorage.getItem('checkInHistory');
-                    const savedCheckOutHistory = localStorage.getItem('checkOutHistory');
-                    const savedAvailableSeats = localStorage.getItem('availableSeats');
-        
-                    if (savedCheckInHistory) {
-                        checkInHistory.innerHTML = savedCheckInHistory;
+                // ตัวอย่างการฟังการสแกน QR Code (ต้องใช้ QR Code Scanner API)
+                document.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') { // ให้สมมุติว่าเมื่อกด Enter จะทำการสแกน
+                        if (currentSeats > 0) {
+                            addCheckIn();
+                        } else {
+                            alert('ไม่มีที่นั่งว่าง');
+                        }
                     }
-                    if (savedCheckOutHistory) {
-                        checkOutHistory.innerHTML = savedCheckOutHistory;
-                    }
-                    if (savedAvailableSeats !== null) {
-                        currentSeats = parseInt(savedAvailableSeats);
-                    }
-                }
+                });
         
-                // เพิ่มการเช็คอินเมื่อโหลดหน้า
-                addCheckIn();
-        
-                // เพิ่มเหตุการณ์ให้กับปุ่มลงรถ
-                getOffButton.addEventListener('click', addCheckOut);
+                // เพิ่มปุ่มลงรถ
+                const getOffButton = document.createElement('button');
+                getOffButton.innerText = 'ลงรถโดยสาร';
+                getOffButton.style.backgroundColor = 'green';
+                getOffButton.style.color = 'white';
+                getOffButton.onclick = addCheckOut;
+                document.body.appendChild(getOffButton);
             </script>
         </body>
         </html>
