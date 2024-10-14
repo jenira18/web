@@ -77,93 +77,86 @@
              <ul id="checkOutHistory"></ul>
          </div>
      
+         <button id="checkOutBtn">ลงรถโดยสาร</button>
+     
          <script>
              const availableSeatsElement = document.getElementById('availableSeats');
              const checkInHistory = document.getElementById('checkInHistory');
              const checkOutHistory = document.getElementById('checkOutHistory');
+             const checkOutBtn = document.getElementById('checkOutBtn');
      
-             // ตรวจสอบว่า LocalStorage มีข้อมูลจำนวนที่นั่งหรือไม่
-             let currentSeats = localStorage.getItem('currentSeats') ? parseInt(localStorage.getItem('currentSeats')) : 8;
-             let checkedInCount = localStorage.getItem('checkedInCount') ? parseInt(localStorage.getItem('checkedInCount')) : 0;
+             // WebSocket เชื่อมต่อกับเซิร์ฟเวอร์
+             const socket = new WebSocket('ws://yourserver.com'); // เปลี่ยน URL นี้เป็นของเซิร์ฟเวอร์ของคุณ
+     
+             let currentSeats = 8;
+             let checkedInCount = 0;
+     
+             // อัปเดตที่นั่งและประวัติการเช็คอินเมื่อมีข้อมูลใหม่จากเซิร์ฟเวอร์
+             socket.onmessage = function(event) {
+                 const data = JSON.parse(event.data);
+                 currentSeats = data.currentSeats;
+                 checkedInCount = data.checkedInCount;
+                 updateAvailableSeats();
+                 updateHistory(data.checkInHistory, data.checkOutHistory);
+             };
      
              // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
              function updateAvailableSeats() {
                  availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
              }
      
-             // ฟังก์ชันอัปเดตประวัติการเช็คอินและลงรถจาก LocalStorage
-             function updateHistory() {
-                 const storedCheckInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
-                 const storedCheckOutHistory = JSON.parse(localStorage.getItem('checkOutHistory')) || [];
+             // ฟังก์ชันอัปเดตประวัติการเช็คอินและลงรถ
+             function updateHistory(checkInData, checkOutData) {
                  checkInHistory.innerHTML = '';
                  checkOutHistory.innerHTML = '';
-                 storedCheckInHistory.forEach(entry => {
+                 checkInData.forEach(entry => {
                      checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${entry}</li>`;
                  });
-                 storedCheckOutHistory.forEach(entry => {
+                 checkOutData.forEach(entry => {
                      checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${entry}</li>`;
                  });
              }
      
-             // ฟังก์ชันเพิ่มการเช็คอินเมื่อสแกน QR Code
+             // ฟังก์ชันเช็คอินอัตโนมัติเมื่อเข้าสู่หน้าเว็บ
              function addCheckIn() {
-                 if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
+                 if (currentSeats > 0) {
                      const now = new Date();
-                     const timestamp = now.toLocaleString(); // เวลาและวันที่
-                     checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
-                     currentSeats--; // ลดจำนวนที่นั่ง
-                     checkedInCount++; // เพิ่มจำนวนคนที่เช็คอิน
+                     const timestamp = now.toLocaleString();
+                     currentSeats--;
+                     checkedInCount++;
                      updateAvailableSeats();
      
-                     // เก็บข้อมูลใน LocalStorage
-                     localStorage.setItem('currentSeats', currentSeats);
-                     localStorage.setItem('checkedInCount', checkedInCount);
+                     // ส่งข้อมูลเช็คอินไปที่เซิร์ฟเวอร์
+                     socket.send(JSON.stringify({ action: 'checkIn', timestamp }));
      
-                     // บันทึกประวัติการเช็คอินใน LocalStorage
-                     const storedCheckInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
-                     storedCheckInHistory.push(timestamp);
-                     localStorage.setItem('checkInHistory', JSON.stringify(storedCheckInHistory));
                  } else {
                      alert('รถโดยสารเต็มแล้ว');
                  }
              }
      
-             // ฟังก์ชันเพิ่มการลงรถ
-             function addCheckOut() {
-                 if (checkedInCount > 0) { // ตรวจสอบว่ามีคนเช็คอินอยู่
+             // ฟังก์ชันลงรถ
+             checkOutBtn.onclick = function() {
+                 if (checkedInCount > 0) {
                      const now = new Date();
-                     const timestamp = now.toLocaleString(); // เวลาและวันที่
-                     checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
-                     currentSeats++; // เพิ่มจำนวนที่นั่ง
-                     if (currentSeats > 8) currentSeats = 8; // ตรวจสอบไม่ให้เกิน 8 ที่นั่ง
-                     checkedInCount--; // ลดจำนวนคนที่เช็คอิน
+                     const timestamp = now.toLocaleString();
+                     currentSeats++;
+                     if (currentSeats > 8) currentSeats = 8; // ไม่ให้ที่นั่งเกิน 8
+                     checkedInCount--;
                      updateAvailableSeats();
      
-                     // เก็บข้อมูลใน LocalStorage
-                     localStorage.setItem('currentSeats', currentSeats);
-                     localStorage.setItem('checkedInCount', checkedInCount);
+                     // ส่งข้อมูลลงรถไปที่เซิร์ฟเวอร์
+                     socket.send(JSON.stringify({ action: 'checkOut', timestamp }));
      
-                     // บันทึกประวัติการลงรถใน LocalStorage
-                     const storedCheckOutHistory = JSON.parse(localStorage.getItem('checkOutHistory')) || [];
-                     storedCheckOutHistory.push(timestamp);
-                     localStorage.setItem('checkOutHistory', JSON.stringify(storedCheckOutHistory));
                  } else {
                      alert('ไม่มีคนเช็คอินอยู่');
                  }
-             }
-     
-             // เมื่อหน้าโหลดเสร็จ
-             window.onload = function() {
-                 updateAvailableSeats(); // อัปเดตจำนวนที่นั่งที่แสดงบนหน้าเว็บเมื่อโหลดเสร็จ
-                 updateHistory(); // แสดงประวัติการเช็คอินและลงรถ
-                 addCheckIn(); // เช็คอินโดยอัตโนมัติเมื่อหน้าเว็บโหลดเสร็จ
              };
      
-             // เพิ่มปุ่มลงรถ
-             const getOffButton = document.createElement('button');
-             getOffButton.innerText = 'ลงรถโดยสาร';
-             getOffButton.onclick = addCheckOut; // เรียกฟังก์ชันลงรถเมื่อกดปุ่ม
-             document.body.appendChild(getOffButton);
+             // อัปเดตข้อมูลครั้งแรกและเช็คอินอัตโนมัติเมื่อหน้าเว็บโหลด
+             window.onload = function() {
+                 socket.send(JSON.stringify({ action: 'getData' }));
+                 addCheckIn(); // เรียกฟังก์ชันเช็คอินทันทีเมื่อหน้าเว็บโหลด
+             };
          </script>
      </body>
      </html>
