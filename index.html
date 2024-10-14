@@ -83,19 +83,17 @@
                const checkOutHistory = document.getElementById('checkOutHistory');
        
                let currentSeats = 8; // จำนวนที่นั่งสูงสุด
-               let isCheckedIn = false; // สถานะการเช็คอิน
+               let checkedInCount = 0; // จำนวนคนที่เช็คอิน
        
                // ฟังก์ชันเพิ่มการเช็คอิน
                function addCheckIn() {
-                   if (currentSeats > 0 && !isCheckedIn) { // ตรวจสอบว่ามีที่นั่งว่างและยังไม่ได้เช็คอิน
+                   if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
                        const now = new Date();
                        const timestamp = now.toLocaleString(); // เวลาและวันที่
                        checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
                        currentSeats--; // ลดจำนวนที่นั่ง
-                       isCheckedIn = true; // เปลี่ยนสถานะเป็นเช็คอินแล้ว
+                       checkedInCount++; // เพิ่มจำนวนคนที่เช็คอิน
                        updateAvailableSeats();
-                   } else if (isCheckedIn) {
-                       alert('คุณได้เช็คอินแล้ว');
                    } else {
                        alert('ไม่มีที่นั่งว่าง');
                    }
@@ -103,15 +101,15 @@
        
                // ฟังก์ชันเพิ่มการลงรถ
                function addCheckOut() {
-                   if (isCheckedIn) { // ตรวจสอบว่ายังเช็คอินอยู่
+                   if (checkedInCount > 0) { // ตรวจสอบว่ามีคนเช็คอินอยู่
                        const now = new Date();
                        const timestamp = now.toLocaleString(); // เวลาและวันที่
                        checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
                        currentSeats++; // เพิ่มจำนวนที่นั่ง
-                       isCheckedIn = false; // เปลี่ยนสถานะเป็นยังไม่เช็คอิน
+                       checkedInCount--; // ลดจำนวนคนที่เช็คอิน
                        updateAvailableSeats();
                    } else {
-                       alert('คุณยังไม่ได้เช็คอิน');
+                       alert('ไม่มีคนเช็คอินอยู่');
                    }
                }
        
@@ -122,6 +120,7 @@
        
                // เมื่อหน้าโหลด
                window.onload = function() {
+                   // ตัวอย่างการเช็คอินเมื่อโหลดหน้าเว็บ
                    addCheckIn(); // เรียกฟังก์ชันเช็คอินเมื่อโหลดหน้าเว็บ
                };
        
@@ -130,6 +129,13 @@
                getOffButton.innerText = 'ลงรถโดยสาร';
                getOffButton.onclick = addCheckOut; // เรียกฟังก์ชันลงรถ
                document.body.appendChild(getOffButton);
+       
+               // ตัวอย่างการฟังการสแกน QR Code (สมมุติให้กด Enter)
+               document.addEventListener('keypress', function(event) {
+                   if (event.key === 'Enter') {
+                       addCheckIn(); // เรียกฟังก์ชันเช็คอินเมื่อกด Enter
+                   }
+               });
            </script>
        </body>
        </html>
