@@ -51,6 +51,9 @@
                 #history {
                     margin-top: 20px;
                 }
+                button {
+                    margin-top: 10px;
+                }
             </style>
         </head>
         <body>
@@ -71,23 +74,36 @@
                 const checkOutHistory = document.getElementById('checkOutHistory');
         
                 let currentSeats = 8; // จำนวนที่นั่งสูงสุด
+                let isCheckedIn = false; // เช็คสถานะการขึ้นรถของผู้ใช้
         
                 // ฟังก์ชันเพิ่มการเช็คอิน
                 function addCheckIn() {
-                    const now = new Date();
-                    const timestamp = now.toLocaleString(); // เวลาและวันที่
-                    checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
-                    currentSeats--; // ลดจำนวนที่นั่ง
-                    updateAvailableSeats();
+                    if (currentSeats > 0 && !isCheckedIn) { // ตรวจสอบว่ามีที่นั่งว่างและยังไม่ได้เช็คอิน
+                        const now = new Date();
+                        const timestamp = now.toLocaleString(); // เวลาและวันที่
+                        checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
+                        currentSeats--; // ลดจำนวนที่นั่ง
+                        isCheckedIn = true; // เปลี่ยนสถานะเป็นเช็คอินแล้ว
+                        updateAvailableSeats();
+                    } else if (isCheckedIn) {
+                        alert('คุณได้เช็คอินแล้ว');
+                    } else {
+                        alert('ไม่มีที่นั่งว่าง');
+                    }
                 }
         
                 // ฟังก์ชันเพิ่มการลงรถ
                 function addCheckOut() {
-                    const now = new Date();
-                    const timestamp = now.toLocaleString(); // เวลาและวันที่
-                    checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
-                    currentSeats++; // เพิ่มจำนวนที่นั่ง
-                    updateAvailableSeats();
+                    if (isCheckedIn) { // ตรวจสอบว่ายังเช็คอินอยู่
+                        const now = new Date();
+                        const timestamp = now.toLocaleString(); // เวลาและวันที่
+                        checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
+                        currentSeats++; // เพิ่มจำนวนที่นั่ง
+                        isCheckedIn = false; // เปลี่ยนสถานะเป็นยังไม่เช็คอิน
+                        updateAvailableSeats();
+                    } else {
+                        alert('คุณยังไม่ได้เช็คอิน');
+                    }
                 }
         
                 // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
@@ -98,11 +114,7 @@
                 // ตัวอย่างการฟังการสแกน QR Code (ต้องใช้ QR Code Scanner API)
                 document.addEventListener('keypress', function(event) {
                     if (event.key === 'Enter') { // ให้สมมุติว่าเมื่อกด Enter จะทำการสแกน
-                        if (currentSeats > 0) {
-                            addCheckIn();
-                        } else {
-                            alert('ไม่มีที่นั่งว่าง');
-                        }
+                        addCheckIn(); // เรียกฟังก์ชันเช็คอิน
                     }
                 });
         
@@ -111,7 +123,7 @@
                 getOffButton.innerText = 'ลงรถโดยสาร';
                 getOffButton.style.backgroundColor = 'green';
                 getOffButton.style.color = 'white';
-                getOffButton.onclick = addCheckOut;
+                getOffButton.onclick = addCheckOut; // เรียกฟังก์ชันลงรถ
                 document.body.appendChild(getOffButton);
             </script>
         </body>
