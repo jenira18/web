@@ -82,8 +82,9 @@
               const checkInHistory = document.getElementById('checkInHistory');
               const checkOutHistory = document.getElementById('checkOutHistory');
       
-              let currentSeats = 8; // จำนวนที่นั่งสูงสุด
-              let checkedInCount = 0; // จำนวนคนที่เช็คอิน
+              // ตรวจสอบว่า LocalStorage มีข้อมูลจำนวนที่นั่งหรือไม่
+              let currentSeats = localStorage.getItem('currentSeats') ? parseInt(localStorage.getItem('currentSeats')) : 8;
+              let checkedInCount = localStorage.getItem('checkedInCount') ? parseInt(localStorage.getItem('checkedInCount')) : 0;
       
               // ฟังก์ชันเพิ่มการเช็คอิน
               function addCheckIn() {
@@ -94,6 +95,10 @@
                       currentSeats--; // ลดจำนวนที่นั่ง
                       checkedInCount++; // เพิ่มจำนวนคนที่เช็คอิน
                       updateAvailableSeats();
+      
+                      // เก็บข้อมูลใน LocalStorage
+                      localStorage.setItem('currentSeats', currentSeats);
+                      localStorage.setItem('checkedInCount', checkedInCount);
                   } else {
                       alert('ไม่มีที่นั่งว่าง');
                   }
@@ -108,6 +113,10 @@
                       currentSeats++; // เพิ่มจำนวนที่นั่ง
                       checkedInCount--; // ลดจำนวนคนที่เช็คอิน
                       updateAvailableSeats();
+      
+                      // เก็บข้อมูลใน LocalStorage
+                      localStorage.setItem('currentSeats', currentSeats);
+                      localStorage.setItem('checkedInCount', checkedInCount);
                   } else {
                       alert('ไม่มีคนเช็คอินอยู่');
                   }
@@ -120,6 +129,7 @@
       
               // เมื่อหน้าโหลดเสร็จ เช็คอินโดยอัตโนมัติ
               window.onload = function() {
+                  updateAvailableSeats(); // อัปเดตจำนวนที่นั่งที่แสดงบนหน้าเว็บเมื่อโหลดเสร็จ
                   addCheckIn(); // เรียกฟังก์ชันเช็คอินโดยอัตโนมัติเมื่อหน้าเว็บโหลด
               };
       
