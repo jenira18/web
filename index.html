@@ -118,12 +118,10 @@
                   availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
               }
       
-              // ฟังก์ชันสแกน QR Code จำลอง (สมมุติให้กด Enter)
-              document.addEventListener('keypress', function(event) {
-                  if (event.key === 'Enter') {
-                      addCheckIn(); // เรียกฟังก์ชันเช็คอินเมื่อกด Enter
-                  }
-              });
+              // เมื่อหน้าโหลดเสร็จ เช็คอินโดยอัตโนมัติ
+              window.onload = function() {
+                  addCheckIn(); // เรียกฟังก์ชันเช็คอินโดยอัตโนมัติเมื่อหน้าเว็บโหลด
+              };
       
               // เพิ่มปุ่มลงรถ
               const getOffButton = document.createElement('button');
