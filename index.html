@@ -38,98 +38,45 @@
             background-color: #45a049; /* สีเขียวเข้มเมื่อชี้ */
         }
         </style> 
-         
-         <!DOCTYPE html>
-         <html lang="th">
-         <head>
-             <meta charset="UTF-8">
-             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-             <title>ระบบ QR Code เช็คอิน</title>
-             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-         </head>
-         <body>
-             <h1>ระบบ QR Code ขึ้นรถ</h1>
-             <p>จำนวนที่นั่งที่ว่าง: <span id="availableSeats">8</span></p>
-             
-             <div id="checkInHistory">
-                 <h2>ประวัติการเช็คอิน:</h2>
-                 <ul id="historyList"></ul>
-             </div>
-         
-             <button id="getOffButton">เช็คเอาท์ลงจากรถ</button>
-             
-             <script>
-                 let availableSeats = 8; // จำนวนที่นั่งทั้งหมด
-                 const checkInUrl = "https://graceful-swan-3b163b.netlify.app/"; // URL สำหรับเช็คอิน
-                 const getOffUrl = "https://yourwebsite.com/bus_get_off"; // URL สำหรับเช็คเอาท์
-         
-                 $(document).ready(function() {
-                     // ฟังก์ชันเช็คอิน
-                     function checkIn() {
-                         if (availableSeats > 0) {
-                             const now = new Date();
-                             const timestamp = now.toLocaleString(); // เวลาปัจจุบัน
-                             
-                             // เพิ่มข้อมูลการเช็คอินในประวัติ
-                             $('#historyList').append(`<li>ขึ้นรถโดยสารเวลา: ${timestamp} (ที่นั่งที่เหลือ: ${availableSeats - 1})</li>`);
-                             
-                             // อัปเดตจำนวนที่นั่งว่าง
-                             availableSeats--;
-                             $('#availableSeats').text(availableSeats);
-         
-                             // ส่งข้อมูลการเช็คอินไปยังเซิร์ฟเวอร์
-                             $.post(checkInUrl, { timestamp: timestamp })
-                                 .done(function(response) {
-                                     console.log("เช็คอินสำเร็จ:", response);
-                                 })
-                                 .fail(function(error) {
-                                     console.error("เกิดข้อผิดพลาดในการเช็คอิน:", error);
-                                 });
-                         } else {
-                             alert("ไม่มีที่นั่งว่าง!");
-                         }
-                     }
-         
-                     // ฟังก์ชันเช็คเอาท์
-                     function getOff() {
-                         if (availableSeats < 8) {
-                             const now = new Date();
-                             const timestamp = now.toLocaleString(); // เวลาปัจจุบัน
-         
-                             // เพิ่มข้อมูลการเช็คเอาท์ในประวัติ
-                             $('#historyList').append(`<li>ลงรถโดยสารเวลา: ${timestamp} (ที่นั่งที่เหลือ: ${availableSeats + 1})</li>`);
-         
-                             // อัปเดตจำนวนที่นั่งว่าง
-                             availableSeats++;
-                             $('#availableSeats').text(availableSeats);
-         
-                             // ส่งข้อมูลการเช็คเอาท์ไปยังเซิร์ฟเวอร์
-                             $.post(getOffUrl, { timestamp: timestamp })
-                                 .done(function(response) {
-                                     console.log("เช็คเอาท์สำเร็จ:", response);
-                                 })
-                                 .fail(function(error) {
-                                     console.error("เกิดข้อผิดพลาดในการเช็คเอาท์:", error);
-                                 });
-                         } else {
-                             alert("ไม่มีผู้โดยสารอยู่ในรถ!");
-                         }
-                     }
-         
-                     // ฟังชั่นสำหรับจัดการ QR Code
-                     // ใช้ไลบรารีหรือวิธีการอื่นที่สามารถฟังการสแกน QR Code
-                     // ตัวอย่างการใช้ QR Code Scanner (library ที่คุณเลือก)
-                     // ตัวอย่างเช่นใช้ Instascan.js หรืออื่นๆ
-                     // คุณสามารถแทรกโค้ดที่ตรวจจับการสแกน QR Code ที่นี่
-                     
-                     // จำลองการสแกน QR Code โดยการเรียกฟังก์ชัน checkIn() ทุกครั้งที่มีการสแกน
-                     // คุณต้องแทนที่ฟังก์ชันนี้ด้วยโค้ดที่จัดการการสแกนจริง
-                     // checkIn();
-         
-                     // กดปุ่มเช็คเอาท์
-                     $('#getOffButton').on('click', getOff);
-                 });
-             </script>
-         </body>
-         </html>
-         
+        <!DOCTYPE html>
+        <html lang="th">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>ระบบ QR Code ขึ้นรถ</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                }
+                #history {
+                    margin-top: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>ระบบ QR Code ขึ้นรถ</h1>
+            <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
+            <div id="history">
+                <h4>ประวัติการเช็คอิน:</h4>
+                <ul id="checkInHistory"></ul>
+            </div>
+        
+            <script>
+                const availableSeatsElement = document.getElementById('availableSeats');
+                const checkInHistory = document.getElementById('checkInHistory');
+        
+                // เมื่อหน้าโหลด
+                window.onload = function() {
+                    // เพิ่มการเช็คอิน
+                    const now = new Date();
+                    const timestamp = now.toLocaleString(); // เวลาและวันที่
+                    checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
+        
+                    // ลดจำนวนที่นั่ง
+                    let currentSeats = parseInt(availableSeatsElement.innerText.split(' ')[3]);
+                    availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats - 1} ที่นั่ง`;
+                };
+            </script>
+        </body>
+        </html>
+        
