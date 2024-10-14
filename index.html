@@ -53,6 +53,15 @@
                 }
                 button {
                     margin-top: 10px;
+                    padding: 10px 15px;
+                    background-color: green;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+                button:hover {
+                    background-color: darkgreen;
                 }
             </style>
         </head>
@@ -63,22 +72,67 @@
                 <h4>ประวัติการเช็คอิน:</h4>
                 <ul id="checkInHistory"></ul>
             </div>
+            <div id="getOffHistory">
+                <h4>ประวัติการลงรถ:</h4>
+                <ul id="checkOutHistory"></ul>
+            </div>
         
             <script>
                 const availableSeatsElement = document.getElementById('availableSeats');
                 const checkInHistory = document.getElementById('checkInHistory');
+                const checkOutHistory = document.getElementById('checkOutHistory');
         
-                // เมื่อหน้าโหลด
-                window.onload = function() {
-                    // เพิ่มการเช็คอิน
-                    const now = new Date();
-                    const timestamp = now.toLocaleString(); // เวลาและวันที่
-                    checkInHistory.innerHTML += <li>ขึ้นรถเวลา: ${timestamp}</li>;
+                let currentSeats = 8; // จำนวนที่นั่งสูงสุด
+                let isCheckedIn = false; // สถานะการเช็คอิน
         
-                    // ลดจำนวนที่นั่ง
-                    let currentSeats = parseInt(availableSeatsElement.innerText.split(' ')[3]);
-                    availableSeatsElement.innerText = จำนวนที่นั่งที่ว่าง: ${currentSeats - 1} ที่นั่ง;
-                };
+                // ฟังก์ชันเพิ่มการเช็คอิน
+                function addCheckIn() {
+                    if (currentSeats > 0 && !isCheckedIn) { // ตรวจสอบว่ามีที่นั่งว่างและยังไม่ได้เช็คอิน
+                        const now = new Date();
+                        const timestamp = now.toLocaleString(); // เวลาและวันที่
+                        checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
+                        currentSeats--; // ลดจำนวนที่นั่ง
+                        isCheckedIn = true; // เปลี่ยนสถานะเป็นเช็คอินแล้ว
+                        updateAvailableSeats();
+                    } else if (isCheckedIn) {
+                        alert('คุณได้เช็คอินแล้ว');
+                    } else {
+                        alert('ไม่มีที่นั่งว่าง');
+                    }
+                }
+        
+                // ฟังก์ชันเพิ่มการลงรถ
+                function addCheckOut() {
+                    if (isCheckedIn) { // ตรวจสอบว่ายังเช็คอินอยู่
+                        const now = new Date();
+                        const timestamp = now.toLocaleString(); // เวลาและวันที่
+                        checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
+                        currentSeats++; // เพิ่มจำนวนที่นั่ง
+                        isCheckedIn = false; // เปลี่ยนสถานะเป็นยังไม่เช็คอิน
+                        updateAvailableSeats();
+                    } else {
+                        alert('คุณยังไม่ได้เช็คอิน');
+                    }
+                }
+        
+                // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
+                function updateAvailableSeats() {
+                    availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+                }
+        
+                // ตัวอย่างการฟังการสแกน QR Code (ต้องใช้ QR Code Scanner API)
+                document.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') { // ให้สมมุติว่าเมื่อกด Enter จะทำการสแกน
+                        addCheckIn(); // เรียกฟังก์ชันเช็คอิน
+                    }
+                });
+        
+                // เพิ่มปุ่มลงรถ
+                const getOffButton = document.createElement('button');
+                getOffButton.innerText = 'ลงรถโดยสาร';
+                getOffButton.onclick = addCheckOut; // เรียกฟังก์ชันลงรถ
+                document.body.appendChild(getOffButton);
             </script>
         </body>
-        </html> 
+        </html>
+        
