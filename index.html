@@ -13,6 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -40,164 +41,147 @@
             <!DOCTYPE html>
             <html lang="th">
             <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ระบบเช็คอินรถโดยสาร 8 ที่นั่ง</title>
-        <style>
-        body {
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>ระบบเช็คอินรถโดยสาร 8 ที่นั่ง</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        margin-top: 50px;
+                    }
+                    .seats {
+                        display: flex;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                        margin-bottom: 20px;
+                    }
+                    .seat {
+                        width: 100px;
+                        height: 100px;
+                        margin: 10px;
+                        background-color: #4CAF50;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: white;
+                        font-size: 24px;
+                        border-radius: 10px;
+                    }
+                    .seat.occupied {
+                        background-color: red;
+                    }
+                    button {
+                        padding: 10px 20px;
+                        font-size: 18px;
+                        cursor: pointer;
+                    }
+                    .info {
+                        margin-top: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+            
+        </body>
             font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50p
+        
             display: flex;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh; }
-        .info {
-            font-size: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
             margin-bottom: 20px;
+        
+        .seat {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            background-color: #4CAF50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            border-radius: 10px;
+        }
+        .seat.occupied {
+            background-color: red;
         }
         button {
             padding: 10px 20px;
             font-size: 18px;
             cursor: pointer;
         }
+        .info {
+            margin-top: 20px;
+            font-size: 20px;
+        }
     </style>
-</head>
-<body>
-    <div class="info" id="seat-info">ที่นั่งว่าง: 8 ที่</div>
-    <div class="info" id="scan-time"></div>
-    <button id="checkout-button">เช็คอินลงจากรถโดยสาร</button>
-
-    <script>
-        // จำนวนที่นั่งเริ่มต้น
-        let availableSeats = 8;
-
-        // อัปเดตการแสดงผลของที่นั่งว่าง
-        function updateSeatInfo() {
-            document.getElementById('seat-info').innerText = `ที่นั่งว่าง: ${availableSeats} ที่`;
-        }
-
-        // ฟังก์ชันจำลองการสแกน QR code
-        function scanQRCode() {
-            if (availableSeats > 0) {
-                availableSeats--;
-                updateSeatInfo();
-                let currentTime = new Date().toLocaleTimeString();
-                document.getElementById('scan-time').innerText = `QR Code สแกนล่าสุดเมื่อ: ${currentTime}`;
-            } else {
-                alert("ที่นั่งเต็มแล้ว");
-            }
-        }
-
-        // ฟังก์ชันเมื่อกดปุ่มเช็คอินลงจากรถ
-        document.getElementById('checkout-button').addEventListener('click', function() {
-            if (availableSeats < 8) {
-                availableSeats++;
-                updateSeatInfo();
-            } else {
-                alert("ไม่มีผู้โดยสารที่ต้องลงจากรถ");
-            }
-        });
-
-        // การเชื่อมต่อ QR Code กับการสแกน (สามารถเชื่อมกับ QR Code จริงผ่านระบบเซิร์ฟเวอร์)
-        function simulateQRScan() {
-            // โค้ดส่วนนี้จำลองการสแกน QR (คุณต้องเชื่อมต่อกับระบบ backend ที่จัดการ QR จริง)
-            setInterval(fetchQRCodeScans, 5000); // เรียกใช้ API ทุก 5 วินาทีในระบบจริง
-
-        }
-
-        // เรียกใช้ฟังก์ชัน simulateQRScan เมื่อได้รับการสแกน QR Code จริง (คุณสามารถใช้ API หรือระบบ backend ของคุณได้)
-        // เช่น เมื่อมีการสแกน QR จากระบบ backend แล้วส่งข้อมูลกลับมาที่หน้านี้
-    </script>
     <!DOCTYPE html>
     <html lang="th">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ระบบแสดงผลการสแกน QR Code</title>
+        <title>ระบบ QR Code สำหรับรถบัส</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-direction: column;
-                padding: 20px;
+                margin: 20px;
             }
-            table {
-                width: 100%;
-                border-collapse: collapse;
+            .container {
                 margin-top: 20px;
             }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: center;
-            }
-            th {
-                background-color: #f2f2f2;
+            #seat-info {
+                margin-top: 20px;
             }
         </style>
     </head>
     <body>
-        <h1>การสแกน QR Code</h1>
-        <p>จำนวนการสแกนทั้งหมด: <span id="scan-count">0</span></p>
-    
-        <table>
-            <thead>
-                <tr>
-                    <th>ลำดับ</th>
-                    <th>เวลา</th>
-                    <th>วันที่</th>
-                </tr>
-            </thead>
-            <tbody id="scan-table-body">
-                <!-- การสแกนจะถูกเพิ่มที่นี่ -->
-            </tbody>
-        </table>
+        <h1>ระบบ QR Code สำหรับรถบัส</h1>
+        <button id="scanButton">สแกน QR Code</button>
+        <button id="getOffButton">กดลงรถบัส</button>
+        
+        <div class="container" id="seat-info">
+            <p>จำนวนที่นั่งที่ว่าง: <span id="availableSeats">8</span> ที่นั่ง</p>
+            <p>จำนวนผู้ขึ้นรถ: <span id="peopleOnBoard">0</span> คน</p>
+        </div>
     
         <script>
-            // ตัวแปรสำหรับเก็บจำนวนการสแกนและข้อมูลการสแกน
-            let scanCount = 0;
-            const scanData = [];
+            let totalSeats = 8; // จำนวนที่นั่งทั้งหมด
+            let availableSeats = totalSeats; // จำนวนที่นั่งที่ว่าง
+            let peopleOnBoard = 0; // จำนวนผู้โดยสารที่ขึ้นรถ
     
-            // ฟังก์ชันจำลองการรับข้อมูลจากการสแกน QR Code (ทดสอบเท่านั้น)
-            function receiveQRCodeScan() {
-                // สร้างข้อมูลจำลองการสแกนใหม่
-                const now = new Date();
-                const time = now.toLocaleTimeString();
-                const date = now.toLocaleDateString();
+            // ฟังก์ชันสำหรับการสแกน QR Code
+            document.getElementById('scanButton').addEventListener('click', function() {
+                if (availableSeats > 0) {
+                    availableSeats--;
+                    peopleOnBoard++;
+                    alert("ขึ้นรถโดยสารแล้ว");
+                    updateSeatInfo();
+                } else {
+                    alert("ที่นั่งเต็ม");
+                }
+            });
     
-                // เพิ่มข้อมูลการสแกนใน array
-                scanCount++;
-                scanData.push({ time, date });
+            // ฟังก์ชันสำหรับการกดปุ่มลงรถ
+            document.getElementById('getOffButton').addEventListener('click', function() {
+                if (peopleOnBoard > 0) {
+                    availableSeats++;
+                    peopleOnBoard--;
+                    alert("ลงรถโดยสารแล้ว");
+                    updateSeatInfo();
+                } else {
+                    alert("ไม่มีผู้โดยสารบนรถ");
+                }
+            });
     
-                // อัปเดตการแสดงผลบนหน้าเว็บ
-                updateScanTable();
+            // ฟังก์ชันสำหรับการอัปเดตข้อมูลที่นั่ง
+            function updateSeatInfo() {
+                document.getElementById('availableSeats').innerText = availableSeats;
+                document.getElementById('peopleOnBoard').innerText = peopleOnBoard;
             }
-    
-            // ฟังก์ชันอัปเดตตารางการแสดงผลข้อมูลการสแกน
-            function updateScanTable() {
-                document.getElementById('scan-count').innerText = scanCount;
-    
-                const tableBody = document.getElementById('scan-table-body');
-                tableBody.innerHTML = ''; // ล้างข้อมูลเก่า
-    
-                // เพิ่มข้อมูลการสแกนใหม่ลงในตาราง
-                scanData.forEach((scan, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${scan.time}</td>
-                        <td>${scan.date}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-    
-            // ทดสอบ: จำลองการรับข้อมูลจากการสแกน QR code ทุก 5 วินาที
-            setInterval(receiveQRCodeScan, 5000); // ในระบบจริง ให้เรียกใช้ API จาก backend แทนการจำลองนี้
-
         </script>
-     </body>
+    </body>
     </html>
-
-      
+    
