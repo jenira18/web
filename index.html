@@ -51,31 +51,99 @@
                 #history {
                     margin-top: 20px;
                 }
+                button {
+                    margin: 10px 0;
+                    padding: 10px;
+                    font-size: 16px;
+                }
             </style>
         </head>
         <body>
             <h1>ระบบ QR Code ขึ้นรถ</h1>
             <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
+            
+            <button id="getOffButton">ลงรถโดยสาร</button>
+        
             <div id="history">
                 <h4>ประวัติการเช็คอิน:</h4>
                 <ul id="checkInHistory"></ul>
+                
+                <h4>ประวัติการลงรถ:</h4>
+                <ul id="checkOutHistory"></ul>
             </div>
         
             <script>
                 const availableSeatsElement = document.getElementById('availableSeats');
                 const checkInHistory = document.getElementById('checkInHistory');
+                const checkOutHistory = document.getElementById('checkOutHistory');
+                const getOffButton = document.getElementById('getOffButton');
+                const maxSeats = 8;
+                let currentSeats = maxSeats;
         
-                // เมื่อหน้าโหลด
+                // โหลดข้อมูลเมื่อหน้าโหลด
                 window.onload = function() {
-                    // เพิ่มการเช็คอิน
+                    // โหลดประวัติจาก Local Storage
+                    loadHistory();
+                    // อัปเดตจำนวนที่นั่ง
+                    updateAvailableSeats();
+                };
+        
+                // ฟังก์ชันสำหรับเพิ่มประวัติการเช็คอิน
+                function addCheckIn() {
                     const now = new Date();
                     const timestamp = now.toLocaleString(); // เวลาและวันที่
                     checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
+                    currentSeats--;
+                    updateAvailableSeats();
+                    saveHistory(); // บันทึกประวัติ
+                }
         
-                    // ลดจำนวนที่นั่ง
-                    let currentSeats = parseInt(availableSeatsElement.innerText.split(' ')[3]);
-                    availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats - 1} ที่นั่ง`;
-                };
+                // ฟังก์ชันสำหรับเพิ่มประวัติการลงรถ
+                function addCheckOut() {
+                    const now = new Date();
+                    const timestamp = now.toLocaleString(); // เวลาและวันที่
+                    checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
+                    currentSeats++;
+                    updateAvailableSeats();
+                    saveHistory(); // บันทึกประวัติ
+                }
+        
+                // อัปเดตจำนวนที่นั่ง
+                function updateAvailableSeats() {
+                    availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+                }
+        
+                // บันทึกประวัติใน Local Storage
+                function saveHistory() {
+                    const checkInData = checkInHistory.innerHTML;
+                    const checkOutData = checkOutHistory.innerHTML;
+                    localStorage.setItem('checkInHistory', checkInData);
+                    localStorage.setItem('checkOutHistory', checkOutData);
+                    localStorage.setItem('availableSeats', currentSeats);
+                }
+        
+                // โหลดประวัติจาก Local Storage
+                function loadHistory() {
+                    const savedCheckInHistory = localStorage.getItem('checkInHistory');
+                    const savedCheckOutHistory = localStorage.getItem('checkOutHistory');
+                    const savedAvailableSeats = localStorage.getItem('availableSeats');
+        
+                    if (savedCheckInHistory) {
+                        checkInHistory.innerHTML = savedCheckInHistory;
+                    }
+                    if (savedCheckOutHistory) {
+                        checkOutHistory.innerHTML = savedCheckOutHistory;
+                    }
+                    if (savedAvailableSeats !== null) {
+                        currentSeats = parseInt(savedAvailableSeats);
+                    }
+                }
+        
+                // เพิ่มการเช็คอินเมื่อโหลดหน้า
+                addCheckIn();
+        
+                // เพิ่มเหตุการณ์ให้กับปุ่มลงรถ
+                getOffButton.addEventListener('click', addCheckOut);
             </script>
         </body>
         </html>
