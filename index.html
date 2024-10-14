@@ -193,12 +193,130 @@
             }
     
             // ทดสอบ: จำลองการรับข้อมูลจากการสแกน QR code ทุก 5 วินาที
-            setInterval(receiveQRCodeScan, 5000); // ในระบบจริง ให้เรียกใช้ API จาก backend แทนการจำลองนี้
+            setInterval(fetchQRCodeScans, 5000); // เรียกใช้ API ทุก 5 วินาทีในระบบจริง
+
+
         </script>
-    </body>
-    </html>
+        <!DOCTYPE html>
+        <html lang="th">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>ระบบเช็คอินรถโดยสาร 8 ที่นั่ง</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                    margin-top: 50px;
+                }
+                .seats {
+                    display: flex;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    margin-bottom: 20px;
+                }
+                .seat {
+                    width: 100px;
+                    height: 100px;
+                    margin: 10px;
+                    background-color: #4CAF50;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: white;
+                    font-size: 24px;
+                    border-radius: 10px;
+                }
+                .seat.occupied {
+                    background-color: red;
+                }
+                button {
+                    padding: 10px 20px;
+                    font-size: 18px;
+                    cursor: pointer;
+                }
+            </style>
+            // ประกาศตัวแปรทั้งหมดภายนอกฟังก์ชัน
+            const totalSeats = 8;  // กำหนดค่าที่นั่งทั้งหมด
+            let availableSeats = totalSeats;  // ใช้ค่าจาก totalSeats
+            
+            function updateSeats() {
+                console.log(availableSeats);  // สามารถใช้งาน availableSeats ได้
+            }
+            
+        </head>
+        <body>
+        
+            <h1>สถานะที่นั่งรถโดยสาร</h1>
+        
+            <div class="seats" id="seats">
+                <!-- สร้างที่นั่ง 8 ที่ -->
+            </div>
+        
+            <button id="checkout-button">เช็คอินลงจากรถโดยสาร</button>
+        
+            <script>
+                // กำหนดจำนวนที่นั่งทั้งหมด
+                const totalSeats = 8;
+                let availableSeats = totalSeats;
+        
+                // สร้างที่นั่งใน DOM
+                function createSeats() {
+                    const seatsContainer = document.getElementById('seats');
+                    seatsContainer.innerHTML = ''; // ล้างข้อมูลเก่าถ้ามี
+                    for (let i = 1; i <= totalSeats; i++) {
+                        const seat = document.createElement('div');
+                        seat.classList.add('seat');
+                        seat.setAttribute('data-seat', i);
+                        seat.innerText = `ที่นั่ง ${i}`;
+                        seatsContainer.appendChild(seat);
+                    }
+                }
+        
+                // อัปเดตสถานะที่นั่งเมื่อสแกน QR code
+                function updateSeats() {
+                    const seats = document.querySelectorAll('.seat');
+                    seats.forEach((seat, index) => {
+                        if (index < totalSeats - availableSeats) {
+                            seat.classList.add('occupied'); // ทำให้ที่นั่งเต็ม
+                        } else {
+                            seat.classList.remove('occupied'); // ทำให้ที่นั่งว่าง
+                        }
+                    });
+                }
+        
+                // ฟังก์ชันจำลองการสแกน QR code
+                function scanQRCode() {
+                    if (availableSeats > 0) {
+                        availableSeats--;
+                        updateSeats();
+                    } else {
+                        alert("ที่นั่งเต็มแล้ว");
+                    }
+                }
+        
+                // ฟังก์ชันเมื่อกดปุ่มเช็คอินลงจากรถโดยสาร
+                document.getElementById('checkout-button').addEventListener('click', function() {
+                    if (availableSeats < totalSeats) {
+                        availableSeats++;
+                        updateSeats();
+                    } else {
+                        alert("ไม่มีผู้โดยสารที่ต้องลงจากรถ");
+                    }
+                });
+        
+                // เรียกใช้ฟังก์ชันสร้างที่นั่งครั้งแรก
+                createSeats();
+        
+                // ทดสอบ: จำลองการสแกน QR code ทุก 3 วินาที (ในระบบจริง ให้เชื่อมกับ backend)
+                setInterval(fetchQRCodeScans, 5000); // เรียกใช้ API ทุก 5 วินาทีในระบบจริง
+
+            </script>
+        
+        </body>
+        </html>
+
     
-</body>
-</html>
+
 
       
