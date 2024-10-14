@@ -106,6 +106,98 @@
         // เรียกใช้ฟังก์ชัน simulateQRScan เมื่อได้รับการสแกน QR Code จริง (คุณสามารถใช้ API หรือระบบ backend ของคุณได้)
         // เช่น เมื่อมีการสแกน QR จากระบบ backend แล้วส่งข้อมูลกลับมาที่หน้านี้
     </script>
+    <!DOCTYPE html>
+    <html lang="th">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ระบบแสดงผลการสแกน QR Code</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                padding: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>การสแกน QR Code</h1>
+        <p>จำนวนการสแกนทั้งหมด: <span id="scan-count">0</span></p>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>ลำดับ</th>
+                    <th>เวลา</th>
+                    <th>วันที่</th>
+                </tr>
+            </thead>
+            <tbody id="scan-table-body">
+                <!-- การสแกนจะถูกเพิ่มที่นี่ -->
+            </tbody>
+        </table>
+    
+        <script>
+            // ตัวแปรสำหรับเก็บจำนวนการสแกนและข้อมูลการสแกน
+            let scanCount = 0;
+            const scanData = [];
+    
+            // ฟังก์ชันจำลองการรับข้อมูลจากการสแกน QR Code (ทดสอบเท่านั้น)
+            function receiveQRCodeScan() {
+                // สร้างข้อมูลจำลองการสแกนใหม่
+                const now = new Date();
+                const time = now.toLocaleTimeString();
+                const date = now.toLocaleDateString();
+    
+                // เพิ่มข้อมูลการสแกนใน array
+                scanCount++;
+                scanData.push({ time, date });
+    
+                // อัปเดตการแสดงผลบนหน้าเว็บ
+                updateScanTable();
+            }
+    
+            // ฟังก์ชันอัปเดตตารางการแสดงผลข้อมูลการสแกน
+            function updateScanTable() {
+                document.getElementById('scan-count').innerText = scanCount;
+    
+                const tableBody = document.getElementById('scan-table-body');
+                tableBody.innerHTML = ''; // ล้างข้อมูลเก่า
+    
+                // เพิ่มข้อมูลการสแกนใหม่ลงในตาราง
+                scanData.forEach((scan, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${scan.time}</td>
+                        <td>${scan.date}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+    
+            // ทดสอบ: จำลองการรับข้อมูลจากการสแกน QR code ทุก 5 วินาที
+            setInterval(receiveQRCodeScan, 5000); // ในระบบจริง ให้เรียกใช้ API จาก backend แทนการจำลองนี้
+        </script>
+    </body>
+    </html>
+    
 </body>
 </html>
 
