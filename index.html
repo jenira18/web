@@ -40,100 +40,94 @@
         </style> 
    
    <!DOCTYPE html>
-   <html lang="th">
-   <head>
-       <meta charset="UTF-8">
-       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-       <title>ระบบ QR Code ขึ้นรถ</title>
-   </head>
-   <body>
-       <h1>ระบบ QR Code ขึ้นรถ</h1>
-       <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
-   
-       <div id="history">
-           <h4>ประวัติการเช็คอิน:</h4>
-           <ul id="checkInHistory"></ul>
-       </div>
-   
-       <div id="getOffHistory">
-           <h4>ประวัติการลงรถ:</h4>
-           <ul id="checkOutHistory"></ul>
-       </div>
-   
-       <button id="getOffButton">ลงรถ</button>
-   
-       <script>
-           const availableSeatsElement = document.getElementById('availableSeats');
-           const checkInHistoryElement = document.getElementById('checkInHistory');
-           const getOffHistoryElement = document.getElementById('checkOutHistory');
-           const getOffButton = document.getElementById('getOffButton');
-   
-           // จำนวนที่นั่งเริ่มต้น
-           let currentSeats = 8;
-   
-           // สร้าง WebSocket เพื่อเชื่อมต่อกับเซิร์ฟเวอร์
-           const socket = new WebSocket('ws://localhost:8080');
-   
-           // เมื่อเซิร์ฟเวอร์ส่งข้อมูลมา
-           socket.onmessage = function(event) {
-               const data = JSON.parse(event.data);
-   
-               // อัปเดตจำนวนที่นั่ง
-               currentSeats = data.currentSeats;
-               availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
-   
-               // อัปเดตประวัติการเช็คอิน
-               checkInHistoryElement.innerHTML = '';
-               data.checkInHistory.forEach(entry => {
-                   checkInHistoryElement.innerHTML += `<li>ผู้ใช้ ${entry.userId} ขึ้นรถเวลา ${entry.time}</li>`;
-               });
-   
-               // อัปเดตประวัติการลงรถ
-               getOffHistoryElement.innerHTML = '';
-               data.checkOutHistory.forEach(entry => {
-                   getOffHistoryElement.innerHTML += `<li>ผู้ใช้ ${entry.userId} ลงรถเวลา ${entry.time}</li>`;
-               });
-           };
-   
-           // ฟังก์ชั่นเมื่อกดปุ่ม "ลงรถ"
-           getOffButton.onclick = function() {
-               if (currentSeats < 8) { // ตรวจสอบว่ามีที่นั่งว่าง
-                   const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID
-                   const time = new Date().toLocaleString(); // เวลาปัจจุบัน
-                   socket.send(JSON.stringify({
-                       type: 'checkOut',
-                       userId: userId,
-                       time: time
-                   }));
-                   currentSeats += 1; // เพิ่มที่นั่งที่ว่างขึ้น
-                   availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
-               } else {
-                   alert('ไม่มีผู้โดยสารในรถ!');
-               }
-           };
-   
-           // ฟังก์ชั่นเมื่อมีการสแกน QR code
-           function handleQRCodeScan(userId) {
-               if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
-                   const time = new Date().toLocaleString(); // เวลาปัจจุบัน
-                   socket.send(JSON.stringify({
-                       type: 'checkIn',
-                       userId: userId,
-                       time: time
-                   }));
-                   currentSeats -= 1; // ลดที่นั่งที่ว่างลง
-                   availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
-               } else {
-                   alert('รถเต็มแล้ว!');
-               }
-           }
-   
-           // จำลองการสแกน QR code (ควรแทนที่ด้วยการเชื่อมต่อกับระบบ QR code จริง)
-           document.body.addEventListener('scan', function(event) {
-               const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID
-               handleQRCodeScan(userId);
-           });
-       </script>
-   </body>
-   </html>
-   
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบ QR Code ขึ้นรถ</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1, h3, h4 { text-align: center; }
+        #history, #getOffButton { margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>ระบบ QR Code ขึ้นรถ</h1>
+    <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
+
+    <div id="history">
+        <h4>ประวัติการเช็คอิน:</h4>
+        <ul id="checkInHistory"></ul>
+    </div>
+
+    <button id="getOffButton" style="display: none;">ลงรถ</button>
+
+    <script>
+        const availableSeatsElement = document.getElementById('availableSeats');
+        const checkInHistoryElement = document.getElementById('checkInHistory');
+        const getOffButton = document.getElementById('getOffButton');
+
+        let currentSeats = 8;
+        const usersCheckedIn = new Set(); // เพื่อเก็บข้อมูลผู้ใช้ที่เช็คอินแล้ว
+
+        const socket = new WebSocket('ws://localhost:8080');
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+
+            // อัปเดตจำนวนที่นั่ง
+            currentSeats = data.currentSeats;
+            availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+
+            // อัปเดตประวัติการเช็คอิน
+            checkInHistoryElement.innerHTML = '';
+            data.checkInHistory.forEach(entry => {
+                checkInHistoryElement.innerHTML += `<li>ผู้ใช้ ${entry.userId} ขึ้นรถเวลา ${entry.time}</li>`;
+            });
+
+            // แสดงปุ่มลงรถถ้ามีผู้ใช้อยู่
+            getOffButton.style.display = currentSeats < 8 ? 'block' : 'none';
+        };
+
+        getOffButton.onclick = function() {
+            // ลงรถได้เฉพาะผู้ใช้ที่เช็คอินแล้ว
+            const userId = Array.from(usersCheckedIn)[0]; // ผู้ใช้คนแรกใน Set
+            if (userId) {
+                const time = new Date().toLocaleString();
+                socket.send(JSON.stringify({
+                    type: 'checkOut',
+                    userId: userId,
+                    time: time
+                }));
+                usersCheckedIn.delete(userId); // ลบผู้ใช้ที่ลงรถแล้ว
+                currentSeats += 1; // เพิ่มที่นั่งที่ว่าง
+                availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+                getOffButton.style.display = currentSeats < 8 ? 'block' : 'none'; // อัปเดตปุ่ม
+            }
+        };
+
+        function handleQRCodeScan(userId) {
+            if (currentSeats > 0 && !usersCheckedIn.has(userId)) { // เช็คว่าผู้ใช้ยังไม่ได้เช็คอิน
+                const time = new Date().toLocaleString();
+                socket.send(JSON.stringify({
+                    type: 'checkIn',
+                    userId: userId,
+                    time: time
+                }));
+                usersCheckedIn.add(userId); // เพิ่มผู้ใช้ที่เช็คอินแล้ว
+                currentSeats -= 1; // ลดที่นั่งที่ว่าง
+                availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+            } else if (usersCheckedIn.has(userId)) {
+                alert('คุณได้เช็คอินแล้ว!');
+            } else {
+                alert('รถเต็มแล้ว!');
+            }
+        }
+
+        document.body.addEventListener('scan', function(event) {
+            const userId = 'user' + Math.floor(Math.random() * 1000);
+            handleQRCodeScan(userId);
+        });
+    </script>
+</body>
+</html>
