@@ -89,23 +89,28 @@
           </div>
       
           <!-- ปุ่มกดสำหรับลงจากรถ -->
-          <button id="checkOutButton">ลงจากรถ</button>
+          <button id="checkOutButton">ลงจากรถโดยสาร</button>
       
           <script>
-              // จำนวนที่นั่งเริ่มต้น
-              let maxSeats = 8;
-              let today = new Date().toLocaleDateString(); // เก็บวันที่ของวันนี้
-      
-              // ตรวจสอบว่า LocalStorage มีจำนวนที่นั่งหรือไม่ ถ้าไม่ให้เริ่มต้นที่ 8
-              if (!localStorage.getItem('availableSeats')) {
-                  localStorage.setItem('availableSeats', maxSeats);
-              }
-      
-              // ตรวจสอบว่ามีข้อมูลผู้ใช้บริการในวันนี้หรือไม่ ถ้าไม่ให้เริ่มต้นที่ 0
-              if (!localStorage.getItem('totalUsersToday') || localStorage.getItem('lastUpdateDate') !== today) {
-                  localStorage.setItem('totalUsersToday', 0);
-                  localStorage.setItem('lastUpdateDate', today);
-              }
+              // ค่าเริ่มต้นของที่นั่งว่าง
+let maxSeats = 8; // แก้ไขให้ถูกต้อง
+
+// ฟังก์ชันสำหรับการอัปเดตประวัติการเช็คอิน
+function addCheckInHistory(action) {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString(); // แสดงเวลา
+    const date = now.toLocaleDateString(); // แสดงวันที่
+    checkInHistory.innerHTML += `<li>${action} เวลา: ${timestamp} วันที่: ${date}</li>`;
+}
+
+// ฟังก์ชันสำหรับการอัปเดตประวัติการเช็คเอาท์
+function addCheckOutHistory(action) {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString();
+    const date = now.toLocaleDateString();
+    checkOutHistory.innerHTML += `<li>${action} เวลา: ${timestamp} วันที่: ${date}</li>`;
+}
+
       
               // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
               const availableSeatsElement = document.getElementById('availableSeats');
