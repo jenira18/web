@@ -84,7 +84,7 @@
      
              // ตรวจสอบว่า LocalStorage มีข้อมูลจำนวนที่นั่งหรือไม่
              let currentSeats = localStorage.getItem('currentSeats') ? parseInt(localStorage.getItem('currentSeats')) : 8;
-             let checkedInCount = localStorage.getItem('checkedInCount') ? parseInt(localStorage.getItem('checkedInCount')) : 0;
+             let checkedInUsers = JSON.parse(localStorage.getItem('checkedInUsers')) || {};
      
              // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
              function updateAvailableSeats() {
@@ -107,19 +107,19 @@
      
              // ฟังก์ชันเพิ่มการเช็คอินเมื่อสแกน QR Code
              function addCheckIn() {
-                 if (localStorage.getItem('lastCheckIn') !== new Date().toDateString()) { // ตรวจสอบวันเพื่อป้องกันการเช็คอินซ้ำ
+                 const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID หรือใช้ ID ที่ได้จาก QR สแกน
+                 if (!checkedInUsers[userId]) { // ตรวจสอบว่าผู้ใช้ยังไม่เช็คอินในระบบ
                      if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
                          const now = new Date();
                          const timestamp = now.toLocaleString(); // เวลาและวันที่
                          checkInHistory.innerHTML += `<li>ขึ้นรถเวลา: ${timestamp}</li>`;
                          currentSeats--; // ลดจำนวนที่นั่ง
-                         checkedInCount++; // เพิ่มจำนวนคนที่เช็คอิน
+                         checkedInUsers[userId] = true; // จดจำว่าผู้ใช้เช็คอินแล้ว
                          updateAvailableSeats();
      
                          // เก็บข้อมูลใน LocalStorage
                          localStorage.setItem('currentSeats', currentSeats);
-                         localStorage.setItem('checkedInCount', checkedInCount);
-                         localStorage.setItem('lastCheckIn', now.toDateString()); // จดจำการเช็คอินล่าสุดของวัน
+                         localStorage.setItem('checkedInUsers', JSON.stringify(checkedInUsers));
      
                          // บันทึกประวัติการเช็คอินใน LocalStorage
                          const storedCheckInHistory = JSON.parse(localStorage.getItem('checkInHistory')) || [];
@@ -128,40 +128,40 @@
                      } else {
                          alert('รถโดยสารเต็มแล้ว');
                      }
+                 } else {
+                     alert('คุณเช็คอินแล้ว');
                  }
              }
      
              // ฟังก์ชันเพิ่มการลงรถ
              function addCheckOut() {
-                 if (checkedInCount > 0) { // ตรวจสอบว่ามีคนเช็คอินอยู่
+                 const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID หรือใช้ ID ที่ได้จาก QR สแกน
+                 if (checkedInUsers[userId]) { // ตรวจสอบว่าผู้ใช้เช็คอินอยู่
                      const now = new Date();
                      const timestamp = now.toLocaleString(); // เวลาและวันที่
                      checkOutHistory.innerHTML += `<li>ลงรถเวลา: ${timestamp}</li>`;
                      currentSeats++; // เพิ่มจำนวนที่นั่ง
                      if (currentSeats > 8) currentSeats = 8; // ตรวจสอบไม่ให้เกิน 8 ที่นั่ง
-                     checkedInCount--; // ลดจำนวนคนที่เช็คอิน
+                     delete checkedInUsers[userId]; // ลบผู้ใช้จากรายการเช็คอิน
                      updateAvailableSeats();
      
                      // เก็บข้อมูลใน LocalStorage
                      localStorage.setItem('currentSeats', currentSeats);
-                     localStorage.setItem('checkedInCount', checkedInCount);
+                     localStorage.setItem('checkedInUsers', JSON.stringify(checkedInUsers));
      
                      // บันทึกประวัติการลงรถใน LocalStorage
                      const storedCheckOutHistory = JSON.parse(localStorage.getItem('checkOutHistory')) || [];
                      storedCheckOutHistory.push(timestamp);
                      localStorage.setItem('checkOutHistory', JSON.stringify(storedCheckOutHistory));
                  } else {
-                     alert('ไม่มีคนเช็คอินอยู่');
+                     alert('คุณยังไม่ได้เช็คอิน');
                  }
              }
      
-             // เมื่อหน้าโหลดเสร็จ (สแกน QR แล้ว)
+             // เมื่อหน้าโหลดเสร็จ
              window.onload = function() {
                  updateAvailableSeats(); // อัปเดตจำนวนที่นั่งที่แสดงบนหน้าเว็บเมื่อโหลดเสร็จ
                  updateHistory(); // แสดงประวัติการเช็คอินและลงรถ
-     
-                 // เช็คอินอัตโนมัติเมื่อมีการสแกน QR Code และเข้าสู่หน้าเว็บ
-                 addCheckIn();
              };
      
              // เพิ่มปุ่มลงรถ
@@ -169,6 +169,9 @@
              getOffButton.innerText = 'ลงรถโดยสาร';
              getOffButton.onclick = addCheckOut; // เรียกฟังก์ชันลงรถเมื่อกดปุ่ม
              document.body.appendChild(getOffButton);
+     
+             // เรียกฟังก์ชันเช็คอินอัตโนมัติเมื่อสแกน QR Code และเข้าสู่หน้าเว็บ
+             addCheckIn();
          </script>
      </body>
      </html>
