@@ -74,6 +74,10 @@
            button:hover {
                background-color: #45a049;
            }
+           #message {
+               color: green;
+               font-weight: bold;
+           }
        </style>
        <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
    </head>
@@ -90,6 +94,7 @@
        </div>
    
        <button id="checkOutButton">ลงจากรถ</button>
+       <div id="message"></div> <!-- แสดงข้อความ -->
        
        <script>
            let maxSeats = 8;
@@ -113,6 +118,7 @@
            const totalUsersElement = document.getElementById('totalUsersToday');
            const checkInHistory = document.getElementById('checkInHistory');
            const checkOutHistory = document.getElementById('checkOutHistory');
+           const messageElement = document.getElementById('message');
    
            // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
            function updateAvailableSeats() {
@@ -158,6 +164,12 @@
                    const now = new Date();
                    const checkInTime = now.toLocaleString(); // เวลาและวันที่
                    updateCheckInHistory(checkInTime);
+   
+                   // แสดงข้อความขึ้นรถ
+                   messageElement.innerText = 'ขึ้นรถโดยสารแล้ว!';
+                   setTimeout(() => {
+                       messageElement.innerText = ''; // ลบข้อความหลังจาก 3 วินาที
+                   }, 3000);
                } else {
                    alert('ที่นั่งเต็มแล้ว');
                }
@@ -216,4 +228,3 @@
    </body>
    </html>
    
-    
