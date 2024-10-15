@@ -68,6 +68,9 @@
            const getOffHistoryElement = document.getElementById('checkOutHistory');
            const getOffButton = document.getElementById('getOffButton');
    
+           // จำนวนที่นั่งเริ่มต้น
+           let currentSeats = 8;
+   
            // สร้าง WebSocket เพื่อเชื่อมต่อกับเซิร์ฟเวอร์
            const socket = new WebSocket('ws://localhost:8080');
    
@@ -76,7 +79,8 @@
                const data = JSON.parse(event.data);
    
                // อัปเดตจำนวนที่นั่ง
-               availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${data.currentSeats} ที่นั่ง`;
+               currentSeats = data.currentSeats;
+               availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
    
                // อัปเดตประวัติการเช็คอิน
                checkInHistoryElement.innerHTML = '';
@@ -93,29 +97,42 @@
    
            // ฟังก์ชั่นเมื่อกดปุ่ม "ลงรถ"
            getOffButton.onclick = function() {
-               const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID
-               socket.send(JSON.stringify({
-                   type: 'checkOut',
-                   userId: userId,
-                   time: new Date().toLocaleString() // ส่งเวลาปัจจุบัน
-               }));
+               if (currentSeats < 8) { // ตรวจสอบว่ามีที่นั่งว่าง
+                   const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID
+                   const time = new Date().toLocaleString(); // เวลาปัจจุบัน
+                   socket.send(JSON.stringify({
+                       type: 'checkOut',
+                       userId: userId,
+                       time: time
+                   }));
+                   currentSeats += 1; // เพิ่มที่นั่งที่ว่างขึ้น
+                   availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+               } else {
+                   alert('ไม่มีผู้โดยสารในรถ!');
+               }
            };
    
            // ฟังก์ชั่นเมื่อมีการสแกน QR code
-           function handleQRCodeScan() {
-               const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID
-               socket.send(JSON.stringify({
-                   type: 'checkIn',
-                   userId: userId,
-                   time: new Date().toLocaleString() // ส่งเวลาปัจจุบัน
-               }));
+           function handleQRCodeScan(userId) {
+               if (currentSeats > 0) { // ตรวจสอบว่ามีที่นั่งว่าง
+                   const time = new Date().toLocaleString(); // เวลาปัจจุบัน
+                   socket.send(JSON.stringify({
+                       type: 'checkIn',
+                       userId: userId,
+                       time: time
+                   }));
+                   currentSeats -= 1; // ลดที่นั่งที่ว่างลง
+                   availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+               } else {
+                   alert('รถเต็มแล้ว!');
+               }
            }
    
            // จำลองการสแกน QR code (ควรแทนที่ด้วยการเชื่อมต่อกับระบบ QR code จริง)
-           document.body.addEventListener('scan', function() {
-               handleQRCodeScan();
+           document.body.addEventListener('scan', function(event) {
+               const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง user ID
+               handleQRCodeScan(userId);
            });
-   
        </script>
    </body>
    </html>
