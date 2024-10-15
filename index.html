@@ -38,104 +38,182 @@
             background-color: #45a049; /* สีเขียวเข้มเมื่อชี้ */
         }
         </style> 
-     <!DOCTYPE html>
-     <html lang="th">
-     <head>
-         <meta charset="UTF-8">
-         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <title>เช็คอินรถโดยสาร</title>
-         <style>
-             body {
-                 font-family: Arial, sans-serif;
-                 margin: 0;
-                 padding: 20px;
-                 background-color: #f0f0f0;
-             }
-             .container {
-                 width: 100%;
-                 margin: 0 auto;
-                 padding: 30px;
-                 background-color: #fff;
-                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-             }
-         </style>
-     </head>
-     <body>
-         <div class="container">
-             <h3 id="availableSeats">จำนวนที่นั่งว่าง: 8 ที่นั่ง</h3>
-             <ul id="checkInHistory"></ul>
-             
-             <div id="reader" style="width: 600px;"></div>
-         </div>
-         
-         <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-         <script>
-             // ฟังก์ชันเช็คอินที่ถูกเรียกจากโทรศัพท์เมื่อมีการสแกน QR code
-             function checkIn(studentId) {
-                 fetch('https://your-api-endpoint/checkin', {
-                     method: 'POST',
-                     headers: {
-                         'Content-Type': 'application/json'
-                     },
-                     body: JSON.stringify({ studentId: studentId })
-                 })
-                 .then(response => response.json())
-                 .then(data => {
-                     console.log('เช็คอินสำเร็จ:', data);
-                     // อัพเดตจำนวนที่นั่งว่างใน UI
-                     updateAvailableSeats(data.availableSeats);
-                     // อัพเดตประวัติการเช็คอิน
-                     updateCheckInHistory(data.checkInTime);
-                 })
-                 .catch((error) => {
-                     console.error('เกิดข้อผิดพลาด:', error);
-                 });
-             }
-     
-             // ฟังก์ชันที่ถูกเรียกเมื่อ QR code ถูกสแกน
-             function onScanSuccess(decodedText, decodedResult) {
-                 console.log(`QR code ถูกสแกน: ${decodedText}`);
-                 
-                 const studentId = decodedText; // สมมติว่า decodedText คือ studentId
-                 checkIn(studentId); // เรียกใช้ฟังก์ชัน checkIn เมื่อสแกน QR code สำเร็จ
-             }
-     
-             // ฟังก์ชันอัพเดตจำนวนที่นั่งว่าง
-             function updateAvailableSeats(availableSeats) {
-                 document.getElementById('availableSeats').innerText = `จำนวนที่นั่งว่าง: ${availableSeats}`;
-             }
-     
-             // ฟังก์ชันอัพเดตประวัติการเช็คอิน
-             function updateCheckInHistory(checkInTime) {
-                 const historyElement = document.getElementById('checkInHistory');
-                 const listItem = document.createElement('li');
-                 listItem.textContent = `ขึ้นรถ: ${checkInTime}`;
-                 historyElement.appendChild(listItem);
-             }
-     
-             // เริ่มต้นการสแกน QR code
-             function startScanner() {
-                 const html5QrCode = new Html5Qrcode("reader");
-     
-                 // เริ่มต้นการสแกน QR code
-                 html5QrCode.start(
-                     { facingMode: "environment" }, // ใช้กล้องด้านหลัง
-                     {
-                         fps: 10, // เฟรมเรท
-                         qrbox: 250 // ขนาดของกรอบ QR code
-                     },
-                     onScanSuccess, // ฟังก์ชันที่ถูกเรียกเมื่อสแกน QR code สำเร็จ
-                     (errorMessage) => {
-                         // ฟังก์ชันนี้จะถูกเรียกเมื่อเกิดข้อผิดพลาดในการสแกน
-                         console.log(`เกิดข้อผิดพลาด: ${errorMessage}`);
-                     }
-                 ).catch(err => {
-                     console.error(`ไม่สามารถเริ่มต้นการสแกน: ${err}`);
-                 });
-             }
+   <!DOCTYPE html>
+   <html lang="th">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>ระบบ QR Code ขึ้นรถ</title>     
+       <style>
+           body {
+               font-family: Arial, sans-serif;
+               margin: 0;
+               padding: 20px;
+               background-color: #f0f0f0;
+           }
+           .container {
+               width: 100%;
+               margin: 0 auto;
+               padding: 30px;
+               background-color: #fff;
+               box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+           }
+           h1 {
+               text-align: center;
+           }
+           #history {
+               margin-top: 20px;
+           }
+           button {
+               padding: 10px 20px;
+               background-color: #4CAF50;
+               color: white;
+               border: none;
+               cursor: pointer;
+           }
+           button:hover {
+               background-color: #45a049;
+           }
+       </style>
+       <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+   </head>
+   <body>
+       <h1>ระบบ QR Code ขึ้นรถ</h1>
+       <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
+       <h3 id="totalUsersToday">จำนวนผู้ใช้บริการวันนี้: 0 คน</h3>
        
-             // เรียกใช้ฟังก์ชันเริ่มต้นเมื่อโหลดหน้า
-             window.onload = startScanner;
-         </script>
-     </body>
-     
+       <div id="history">
+           <h4>ประวัติการเช็คอิน:</h4>
+           <ul id="checkInHistory"></ul>
+           <h4>ประวัติการลงจากรถ:</h4>
+           <ul id="checkOutHistory"></ul>
+       </div>
+   
+       <button id="checkOutButton">ลงจากรถ</button>
+       
+       <script>
+           let maxSeats = 8;
+           let totalUsers = 0;
+   
+           // ตรวจสอบว่า LocalStorage มีจำนวนที่นั่งหรือไม่ ถ้าไม่ให้เริ่มต้นที่ 8
+           if (!localStorage.getItem('availableSeats')) {
+               localStorage.setItem('availableSeats', maxSeats);
+           }
+   
+           if (!localStorage.getItem('totalUsers')) {
+               localStorage.setItem('totalUsers', totalUsers);
+           }
+   
+           // ตรวจสอบการเช็คอินล่าสุด
+           if (!localStorage.getItem('lastCheckIn')) {
+               localStorage.setItem('lastCheckIn', JSON.stringify({}));
+           }
+   
+           const availableSeatsElement = document.getElementById('availableSeats');
+           const totalUsersElement = document.getElementById('totalUsersToday');
+           const checkInHistory = document.getElementById('checkInHistory');
+           const checkOutHistory = document.getElementById('checkOutHistory');
+   
+           // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
+           function updateAvailableSeats() {
+               let currentSeats = localStorage.getItem('availableSeats');
+               availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+           }
+   
+           // ฟังก์ชันอัปเดตประวัติการเช็คอิน
+           function updateCheckInHistory(checkInTime) {
+               const listItem = document.createElement('li');
+               listItem.textContent = `ขึ้นรถ: ${checkInTime}`;
+               checkInHistory.appendChild(listItem);
+           }
+   
+           // ฟังก์ชันอัปเดตประวัติการลงจากรถ
+           function updateCheckOutHistory(checkOutTime) {
+               const listItem = document.createElement('li');
+               listItem.textContent = `ลงจากรถ: ${checkOutTime}`;
+               checkOutHistory.appendChild(listItem);
+           }
+   
+           // ฟังก์ชันเช็คอินที่ถูกเรียกจากโทรศัพท์เมื่อมีการสแกน QR code
+           function checkIn(studentId) {
+               let currentSeats = parseInt(localStorage.getItem('availableSeats'));
+               const lastCheckIn = JSON.parse(localStorage.getItem('lastCheckIn'));
+   
+               // ตรวจสอบว่าผู้ใช้ได้เช็คอินไปแล้วหรือไม่
+               if (lastCheckIn[studentId]) {
+                   alert('คุณได้เช็คอินแล้ว!');
+                   return;
+               }
+   
+               if (currentSeats > 0) {
+                   localStorage.setItem('availableSeats', currentSeats - 1);
+                   totalUsers = parseInt(localStorage.getItem('totalUsers')) + 1;
+                   localStorage.setItem('totalUsers', totalUsers);
+                   lastCheckIn[studentId] = true; // บันทึกการเช็คอิน
+                   localStorage.setItem('lastCheckIn', JSON.stringify(lastCheckIn));
+                   
+                   updateAvailableSeats();
+                   totalUsersElement.innerText = `จำนวนผู้ใช้บริการวันนี้: ${totalUsers} คน`;
+   
+                   const now = new Date();
+                   const checkInTime = now.toLocaleString(); // เวลาและวันที่
+                   updateCheckInHistory(checkInTime);
+               } else {
+                   alert('ที่นั่งเต็มแล้ว');
+               }
+           }
+   
+           // ฟังก์ชันเช็คเอาท์ (เพิ่มจำนวนที่นั่ง 1)
+           function checkOut() {
+               let currentSeats = parseInt(localStorage.getItem('availableSeats'));
+               if (currentSeats < maxSeats) {
+                   localStorage.setItem('availableSeats', currentSeats + 1);
+                   const now = new Date();
+                   const checkOutTime = now.toLocaleString(); // เวลาและวันที่
+                   updateCheckOutHistory(checkOutTime);
+                   updateAvailableSeats();
+               }
+           }
+   
+           // ฟังก์ชันที่ถูกเรียกเมื่อ QR code ถูกสแกน
+           function onScanSuccess(decodedText, decodedResult) {
+               console.log(`QR code ถูกสแกน: ${decodedText}`);
+               const studentId = decodedText; // สมมติว่า decodedText คือ studentId
+               checkIn(studentId); // เรียกใช้ฟังก์ชัน checkIn เมื่อสแกน QR code สำเร็จ
+           }
+   
+           // เริ่มต้นการสแกน QR code
+           function startScanner() {
+               const html5QrCode = new Html5Qrcode("reader");
+   
+               // เริ่มต้นการสแกน QR code
+               html5QrCode.start(
+                   { facingMode: "environment" }, // ใช้กล้องด้านหลัง
+                   {
+                       fps: 10, // เฟรมเรท
+                       qrbox: 250 // ขนาดของกรอบ QR code
+                   },
+                   onScanSuccess, // ฟังก์ชันที่ถูกเรียกเมื่อสแกน QR code สำเร็จ
+                   (errorMessage) => {
+                       // ฟังก์ชันนี้จะถูกเรียกเมื่อเกิดข้อผิดพลาดในการสแกน
+                       console.log(`เกิดข้อผิดพลาด: ${errorMessage}`);
+                   }
+               ).catch(err => {
+                   console.error(`ไม่สามารถเริ่มต้นการสแกน: ${err}`);
+               });
+           }
+   
+           // เรียกใช้ฟังก์ชันเริ่มต้นเมื่อโหลดหน้า
+           window.onload = function() {
+               updateAvailableSeats();
+               totalUsersElement.innerText = `จำนวนผู้ใช้บริการวันนี้: ${localStorage.getItem('totalUsers')} คน`;
+               startScanner();
+           };
+   
+           // เพิ่ม Listener สำหรับปุ่มลงจากรถ
+           document.getElementById("checkOutButton").addEventListener("click", checkOut);
+       </script>
+   </body>
+   </html>
+   
+    
