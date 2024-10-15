@@ -70,6 +70,7 @@
                color: white;
                border: none;
                cursor: pointer;
+               margin: 10px 0;
            }
            button:hover {
                background-color: #45a049;
@@ -80,9 +81,13 @@
        <h1>ระบบ QR Code ขึ้นรถ</h1>
        <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
        
+       <button id="checkOutButton">ลงจากรถโดยสาร</button>
+       
        <div id="history">
            <h4>ประวัติการเช็คอิน:</h4>
            <ul id="checkInHistory"></ul>
+           <h4>ประวัติการลงจากรถ:</h4>
+           <ul id="checkOutHistory"></ul>
        </div>
    
        <script>
@@ -99,10 +104,16 @@
                localStorage.setItem('checkInHistory', JSON.stringify([]));
            }
    
+           // ตรวจสอบว่า LocalStorage มีประวัติการลงจากรถหรือไม่ ถ้าไม่ให้เป็น array ว่าง
+           if (!localStorage.getItem('checkOutHistory')) {
+               localStorage.setItem('checkOutHistory', JSON.stringify([]));
+           }
+   
            // อัปเดตจำนวนที่นั่งว่างและประวัติการเช็คอิน
            const availableSeatsElement = document.getElementById('availableSeats');
            const checkInHistory = document.getElementById('checkInHistory');
-           
+           const checkOutHistory = document.getElementById('checkOutHistory');
+   
            // ฟังก์ชันแสดงจำนวนที่นั่งที่ว่าง
            function updateAvailableSeats() {
                let currentSeats = localStorage.getItem('availableSeats');
@@ -118,10 +129,20 @@
                });
            }
    
+           // ฟังก์ชันแสดงประวัติการลงจากรถ
+           function updateCheckOutHistory() {
+               const history = JSON.parse(localStorage.getItem('checkOutHistory'));
+               checkOutHistory.innerHTML = ''; // ล้างประวัติที่แสดงอยู่ก่อน
+               history.forEach(entry => {
+                   checkOutHistory.innerHTML += `<li>${entry.action} เวลา: ${entry.timestamp}</li>`;
+               });
+           }
+   
            // เมื่อหน้าโหลดแสดงจำนวนที่นั่งที่เหลือและประวัติ
            window.onload = function() {
                updateAvailableSeats();
                updateCheckInHistory();
+               updateCheckOutHistory();
    
                // เช็คอินอัตโนมัติเมื่อเข้าสู่หน้าเว็บผ่านการสแกน QR Code
                checkIn();
@@ -149,6 +170,30 @@
                localStorage.setItem('checkInHistory', JSON.stringify(history));
            }
    
+           // ฟังก์ชันลงจากรถโดยสาร (เพิ่มจำนวนที่นั่ง 1)
+           function checkOut() {
+               let currentSeats = parseInt(localStorage.getItem('availableSeats'));
+               if (currentSeats < maxSeats) {
+                   localStorage.setItem('availableSeats', currentSeats + 1);
+                   addCheckOutHistory("ลงจากรถ");
+                   updateAvailableSeats();
+                   updateCheckOutHistory();
+               } else {
+                   alert('ไม่มีผู้โดยสารอยู่ในรถ');
+               }
+           }
+   
+           // ฟังก์ชันเพิ่มประวัติการลงจากรถ
+           function addCheckOutHistory(action) {
+               const now = new Date();
+               const timestamp = now.toLocaleString(); // เวลาและวันที่
+               let history = JSON.parse(localStorage.getItem('checkOutHistory'));
+               history.push({ action, timestamp });
+               localStorage.setItem('checkOutHistory', JSON.stringify(history));
+           }
+   
+           // เพิ่ม Listener สำหรับปุ่มลงจากรถ
+           document.getElementById("checkOutButton").addEventListener("click", checkOut);
        </script>
    </body>
    </html>
