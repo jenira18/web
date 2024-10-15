@@ -43,7 +43,7 @@
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>ระบบ QR Code ขึ้นรถ</title>
+          <title>ระบบ QR Code ขึ้นรถ</title>     
           <style>
               body {
                   font-family: Arial, sans-serif;
@@ -64,10 +64,6 @@
               #history {
                   margin-top: 20px;
               }
-              #datetime {
-                  text-align: right;
-                  margin-bottom: 20px;
-              }
               button {
                   padding: 10px 20px;
                   background-color: #4CAF50;
@@ -78,120 +74,97 @@
               button:hover {
                   background-color: #45a049;
               }
-              .history-section {
-                  margin-top: 20px;
-              }
-              .history-section h4 {
-                  margin-bottom: 5px;
-              }
-              .history-section ul {
-                  list-style-type: none;
-                  padding: 0;
-              }
-              .history-section li {
-                  background-color: #e0e0e0;
-                  padding: 5px;
-                  margin-bottom: 5px;
-              }
           </style>
       </head>
       <body>
           <h1>ระบบ QR Code ขึ้นรถ</h1>
-      
-          <!-- แสดงวันและเวลา -->
-          <div id="datetime"></div>
-      
           <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
-      
-          <!-- ช่องสำหรับประวัติการเช็คอิน -->
-          <div id="checkInHistorySection" class="history-section">
-              <h4>ประวัติการเช็คอิน:</h4>
+          <h3 id="totalUsersToday">จำนวนผู้ใช้บริการวันนี้: 0 คน</h3>
+          
+          <div id="history">
+              <h4>ประวัติการเช็คอินขึ้นรถ:</h4>
               <ul id="checkInHistory"></ul>
-          </div>
-      
-          <!-- ช่องสำหรับประวัติการลงจากรถ -->
-          <div id="checkOutHistorySection" class="history-section">
               <h4>ประวัติการลงจากรถ:</h4>
               <ul id="checkOutHistory"></ul>
           </div>
       
-          <!-- ปุ่มกดลงจากรถ -->
+          <!-- ปุ่มกดสำหรับลงจากรถ -->
           <button id="checkOutButton">ลงจากรถ</button>
       
           <script>
+              // จำนวนที่นั่งเริ่มต้น
               let maxSeats = 8;
+              let today = new Date().toLocaleDateString(); // เก็บวันที่ของวันนี้
       
               // ตรวจสอบว่า LocalStorage มีจำนวนที่นั่งหรือไม่ ถ้าไม่ให้เริ่มต้นที่ 8
               if (!localStorage.getItem('availableSeats')) {
                   localStorage.setItem('availableSeats', maxSeats);
               }
       
-              // ตรวจสอบว่า LocalStorage มีประวัติการเช็คอินและเช็คเอาท์หรือไม่ ถ้าไม่ให้เป็น array ว่าง
-              if (!localStorage.getItem('checkInHistory')) {
-                  localStorage.setItem('checkInHistory', JSON.stringify([]));
-              }
-              if (!localStorage.getItem('checkOutHistory')) {
-                  localStorage.setItem('checkOutHistory', JSON.stringify([]));
+              // ตรวจสอบว่ามีข้อมูลผู้ใช้บริการในวันนี้หรือไม่ ถ้าไม่ให้เริ่มต้นที่ 0
+              if (!localStorage.getItem('totalUsersToday') || localStorage.getItem('lastUpdateDate') !== today) {
+                  localStorage.setItem('totalUsersToday', 0);
+                  localStorage.setItem('lastUpdateDate', today);
               }
       
-              // ตรวจสอบว่าผู้ใช้เช็คเอาท์แล้วหรือไม่
-              if (!localStorage.getItem('hasCheckedOut')) {
-                  localStorage.setItem('hasCheckedOut', 'false');
-              }
-      
-              // อัปเดตจำนวนที่นั่งว่างและประวัติการเช็คอิน/เช็คเอาท์
+              // ฟังก์ชันอัปเดตจำนวนที่นั่งว่าง
               const availableSeatsElement = document.getElementById('availableSeats');
               const checkInHistory = document.getElementById('checkInHistory');
               const checkOutHistory = document.getElementById('checkOutHistory');
+              const totalUsersTodayElement = document.getElementById('totalUsersToday');
       
-              // ฟังก์ชันแสดงจำนวนที่นั่งที่ว่าง
               function updateAvailableSeats() {
                   let currentSeats = localStorage.getItem('availableSeats');
                   availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
               }
       
-              // ฟังก์ชันแสดงประวัติการเช็คอิน
-              function updateCheckInHistory() {
-                  const history = JSON.parse(localStorage.getItem('checkInHistory'));
-                  history.forEach(entry => {
-                      checkInHistory.innerHTML += `<li>${entry.action} เวลา: ${entry.timestamp}</li>`;
-                  });
+              // ฟังก์ชันแสดงจำนวนผู้ใช้บริการวันนี้
+              function updateTotalUsersToday() {
+                  let totalUsers = localStorage.getItem('totalUsersToday');
+                  totalUsersTodayElement.innerText = `จำนวนผู้ใช้บริการวันนี้: ${totalUsers} คน`;
               }
       
-              // ฟังก์ชันแสดงประวัติการเช็คเอาท์
-              function updateCheckOutHistory() {
-                  const history = JSON.parse(localStorage.getItem('checkOutHistory'));
-                  history.forEach(entry => {
-                      checkOutHistory.innerHTML += `<li>${entry.action} เวลา: ${entry.timestamp}</li>`;
-                  });
-              }
-      
-              // ฟังก์ชันแสดงวันและเวลาปัจจุบัน
-              function updateDateTime() {
+              // ฟังก์ชันบันทึกประวัติการเช็คอิน
+              function addCheckInHistory(action) {
                   const now = new Date();
-                  const formattedDateTime = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-                  document.getElementById('datetime').innerText = `วันที่และเวลา: ${formattedDateTime}`;
+                  const timestamp = now.toLocaleString(); // เวลาและวันที่
+                  checkInHistory.innerHTML += `<li>${action} เวลา: ${timestamp}</li>`;
               }
       
-              // เมื่อหน้าโหลดแสดงจำนวนที่นั่งที่เหลือ ประวัติ และวันที่
+              // ฟังก์ชันบันทึกประวัติการเช็คเอาท์
+              function addCheckOutHistory(action) {
+                  const now = new Date();
+                  const timestamp = now.toLocaleString(); // เวลาและวันที่
+                  checkOutHistory.innerHTML += `<li>${action} เวลา: ${timestamp}</li>`;
+              }
+      
+              // เมื่อโหลดหน้าให้แสดงจำนวนที่นั่งและประวัติที่บันทึกไว้ใน LocalStorage
               window.onload = function() {
                   updateAvailableSeats();
-                  updateCheckInHistory();
-                  updateCheckOutHistory();
-                  updateDateTime();
-                  setInterval(updateDateTime, 1000);  // อัปเดตเวลาทุกๆ วินาที
-      
-                  // เช็คอินเมื่อเปิดหน้าเว็บ (การสแกน QR)
-                  checkIn();
+                  updateTotalUsersToday();
+                  if (localStorage.getItem('checkInHistory')) {
+                      checkInHistory.innerHTML = localStorage.getItem('checkInHistory');
+                  }
+                  if (localStorage.getItem('checkOutHistory')) {
+                      checkOutHistory.innerHTML = localStorage.getItem('checkOutHistory');
+                  }
               };
       
-              // ฟังก์ชันเช็คอิน (ลดจำนวนที่นั่ง 1)
+              // ฟังก์ชันเช็คอิน (ลดจำนวนที่นั่ง 1 และเพิ่มผู้ใช้บริการวันนี้)
               function checkIn() {
                   let currentSeats = parseInt(localStorage.getItem('availableSeats'));
                   if (currentSeats > 0) {
                       localStorage.setItem('availableSeats', currentSeats - 1);
                       updateAvailableSeats();
                       addCheckInHistory("ขึ้นรถโดยสาร");
+      
+                      // บันทึกประวัติใน LocalStorage
+                      localStorage.setItem('checkInHistory', checkInHistory.innerHTML);
+      
+                      // เพิ่มจำนวนผู้ใช้บริการวันนี้
+                      let totalUsers = parseInt(localStorage.getItem('totalUsersToday'));
+                      localStorage.setItem('totalUsersToday', totalUsers + 1);
+                      updateTotalUsersToday();
                   } else {
                       alert('ที่นั่งเต็มแล้ว');
                   }
@@ -199,42 +172,30 @@
       
               // ฟังก์ชันเช็คเอาท์ (เพิ่มจำนวนที่นั่ง 1)
               function checkOut() {
-                  let hasCheckedOut = localStorage.getItem('hasCheckedOut');
                   let currentSeats = parseInt(localStorage.getItem('availableSeats'));
-      
-                  if (hasCheckedOut === 'false' && currentSeats < maxSeats) {
+                  if (currentSeats < maxSeats) {
                       localStorage.setItem('availableSeats', currentSeats + 1);
-                      localStorage.setItem('hasCheckedOut', 'true');
-                      addCheckOutHistory("ลงจากรถ");
                       updateAvailableSeats();
-                  } else if (hasCheckedOut === 'true') {
-                      alert('คุณได้ลงจากรถแล้ว ไม่สามารถลงได้อีก');
+                      addCheckOutHistory("ลงจากรถ");
+      
+                      // บันทึกประวัติใน LocalStorage
+                      localStorage.setItem('checkOutHistory', checkOutHistory.innerHTML);
+                  } else {
+                      alert('ไม่มีคนลงจากรถ');
                   }
               }
       
-              // ฟังก์ชันเพิ่มประวัติการเช็คอิน (โดยไม่ลบประวัติเดิม)
-              function addCheckInHistory(action) {
-                  const now = new Date();
-                  const timestamp = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-                  let history = JSON.parse(localStorage.getItem('checkInHistory'));
-                  history.push({ action, timestamp });
-                  localStorage.setItem('checkInHistory', JSON.stringify(history));
-                  checkInHistory.innerHTML += `<li>${action} เวลา: ${timestamp}</li>`;  // เพิ่มรายการเช็คอินใหม่
+              // ฟังก์ชันจำลองการสแกน QR Code (จะถูกเรียกเมื่อสแกนสำเร็จ)
+              function onQRCodeScanned() {
+                  checkIn();
               }
       
-              // ฟังก์ชันเพิ่มประวัติการเช็คเอาท์ (โดยไม่ลบประวัติเดิม)
-              function addCheckOutHistory(action) {
-                  const now = new Date();
-                  const timestamp = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-                  let history = JSON.parse(localStorage.getItem('checkOutHistory'));
-                  history.push({ action, timestamp });
-                  localStorage.setItem('checkOutHistory', JSON.stringify(history));
-                  checkOutHistory.innerHTML += `<li>${action} เวลา: ${timestamp}</li>`;  // เพิ่มรายการเช็คเอาท์ใหม่
-              }
-      
-              // ปุ่มกดลงจากรถ
+              // เชื่อมต่อกับปุ่มลงจากรถ
               document.getElementById('checkOutButton').addEventListener('click', checkOut);
       
+              // ตัวอย่างฟังก์ชันที่ใช้เรียกเมื่อมีการสแกน QR
+              // คุณจะต้องเชื่อมต่อกับระบบสแกน QR Code ของโทรศัพท์ในส่วนนี้
+              // ตัวอย่างเช่น: onQRCodeScanned();
           </script>
       </body>
       </html>
