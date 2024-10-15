@@ -38,119 +38,162 @@
             background-color: #45a049; /* สีเขียวเข้มเมื่อชี้ */
         }
         </style> 
-           <!DOCTYPE html>
-           <html lang="th">
-           <head>
-               <meta charset="UTF-8">
-               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-               <title>ระบบ QR Code ขึ้นรถ</title>
-               <style>
-                   body { font-family: Arial, sans-serif; }
-                   h1, h3, h4 { text-align: center; }
-                   #history, #getOffButton { margin: 20px; }
-               </style>
-           <!DOCTYPE html>
-           <html lang="th">
-           <head>
-               <meta charset="UTF-8">
-               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-               <title>ระบบ QR Code ขึ้นรถ</title>
-               <style>
-                   body { font-family: Arial, sans-serif; }
-                   h1, h3, h4 { text-align: center; }
-                   #history, #getOffButton { margin: 20px; }
-               </style>
-           </head>
-           <body>
-               <h1>ระบบ QR Code ขึ้นรถ</h1>
-               <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
-           
-               <div id="checkInHistorySection">
-                   <h4>ประวัติการเช็คอิน:</h4>
-                   <ul id="checkInHistory"></ul>
-               </div>
-           
-               <div id="checkOutHistorySection">
-                   <h4>ประวัติการลงรถ:</h4>
-                   <ul id="checkOutHistory"></ul>
-               </div>
-           
-               <button id="getOffButton" style="display: none;">ลงรถโดยสาร</button>
-           
-               <script>
-                   const availableSeatsElement = document.getElementById('availableSeats');
-                   const checkInHistoryElement = document.getElementById('checkInHistory');
-                   const checkOutHistoryElement = document.getElementById('checkOutHistory');
-                   const getOffButton = document.getElementById('getOffButton');
-           
-                   let currentSeats = 8;
-                   let userCheckedIn = false; // สถานะการเช็คอิน
-                   let userCheckedOut = false; // สถานะการลงรถ
-                   let currentUserId = null; // เก็บ userId ของผู้ใช้ที่เช็คอิน
-           
-                   const socket = new WebSocket('ws://localhost:8080');
-           
-                   // เมื่อมีการรับข้อมูลจากเซิร์ฟเวอร์ (อัปเดตเรียลไทม์)
-                   socket.onmessage = function(event) {
-                       const data = JSON.parse(event.data);
-                       if (data.error) {
-                           alert(data.error);
-                       } else {
-                           currentSeats = data.currentSeats;
-                           availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
-           
-                           // อัปเดตประวัติการเช็คอิน
-                           checkInHistoryElement.innerHTML = '';
-                           data.checkInHistory.forEach(entry => {
-                               checkInHistoryElement.innerHTML += `<li>ผู้ใช้ ${entry.userId} ขึ้นรถเวลา ${entry.time}</li>`;
-                           });
-           
-                           // แสดงปุ่มลงรถถ้ามีผู้ใช้เช็คอินแล้ว
-                           getOffButton.style.display = userCheckedIn && !userCheckedOut ? 'block' : 'none';
-                       }
-                   };
-           
-                   // ฟังก์ชันจัดการการกดปุ่มลงรถ
-                   getOffButton.onclick = function() {
-                       if (userCheckedIn && !userCheckedOut) {
-                           const time = new Date().toLocaleString(); // แสดงวันที่และเวลาปัจจุบัน
-                           socket.send(JSON.stringify({
-                               type: 'checkOut',
-                               userId: currentUserId,
-                               time: time
-                           }));
-                           userCheckedOut = true;
-                           getOffButton.style.display = 'none'; // ซ่อนปุ่มลงรถ
-                           checkOutHistoryElement.innerHTML += `<li>ผู้ใช้ ${currentUserId} ลงรถเวลา ${time}</li>`;
-                       }
-                   };
-           
-                   // ฟังก์ชันจัดการเมื่อสแกน QR Code
-                   function handleQRCodeScan(userId) {
-                       if (currentSeats > 0 && !userCheckedIn) {
-                           const time = new Date().toLocaleString(); // แสดงวันที่และเวลาปัจจุบัน
-                           socket.send(JSON.stringify({
-                               type: 'checkIn',
-                               userId: userId,
-                               time: time
-                           }));
-                           currentUserId = userId;
-                           userCheckedIn = true;
-                           userCheckedOut = false; // รีเซ็ตสถานะการลงรถ
-                           getOffButton.style.display = 'block'; // แสดงปุ่มลงจากรถ
-                       } else if (userCheckedIn) {
-                           alert('คุณได้เช็คอินแล้ว!');
-                       } else {
-                           alert('รถเต็มแล้ว!');
-                       }
-                   }
-           
-                   // จำลองการสแกน QR Code (ฟังก์ชันนี้จะถูกเรียกเมื่อสแกน QR จริง)
-                   document.body.addEventListener('scan', function(event) {
-                       const userId = 'user' + Math.floor(Math.random() * 1000); // จำลอง userId จาก QR
-                       handleQRCodeScan(userId);
-                   });
-               </script>
-           </body>
-           </html>
-           
+      <!DOCTYPE html>
+      <html lang="th">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>ระบบ QR Code ขึ้นรถ</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  margin: 0;
+                  padding: 20px;
+                  background-color: #f0f0f0;
+              }
+              .container {
+                  width: 100%;
+                  margin: 0 auto;
+                  padding: 30px;
+                  background-color: #fff;
+                  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+              }
+              h1 {
+                  text-align: center;
+              }
+              #history {
+                  margin-top: 20px;
+              }
+              #datetime {
+                  text-align: right;
+                  margin-bottom: 20px;
+              }
+              button {
+                  padding: 10px 20px;
+                  background-color: #4CAF50;
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+              }
+              button:hover {
+                  background-color: #45a049;
+              }
+          </style>
+      </head>
+      <body>
+          <h1>ระบบ QR Code ขึ้นรถ</h1>
+      
+          <!-- แสดงวันและเวลา -->
+          <div id="datetime"></div>
+      
+          <h3 id="availableSeats">จำนวนที่นั่งที่ว่าง: 8 ที่นั่ง</h3>
+          
+          <div id="history">
+              <h4>ประวัติการเช็คอิน:</h4>
+              <ul id="checkInHistory"></ul>
+          </div>
+      
+          <!-- ปุ่มกดลงจากรถ -->
+          <button id="checkOutButton">ลงจากรถ</button>
+      
+          <script>
+              // จำนวนที่นั่งเริ่มต้น
+              let maxSeats = 8;
+      
+              // ตรวจสอบว่า LocalStorage มีจำนวนที่นั่งหรือไม่ ถ้าไม่ให้เริ่มต้นที่ 8
+              if (!localStorage.getItem('availableSeats')) {
+                  localStorage.setItem('availableSeats', maxSeats);
+              }
+      
+              // ตรวจสอบว่า LocalStorage มีประวัติการเช็คอินหรือไม่ ถ้าไม่ให้เป็น array ว่าง
+              if (!localStorage.getItem('checkInHistory')) {
+                  localStorage.setItem('checkInHistory', JSON.stringify([]));
+              }
+      
+              // ตรวจสอบว่าผู้ใช้เช็คเอาท์แล้วหรือไม่
+              if (!localStorage.getItem('hasCheckedOut')) {
+                  localStorage.setItem('hasCheckedOut', 'false');
+              }
+      
+              // อัปเดตจำนวนที่นั่งว่างและประวัติการเช็คอิน
+              const availableSeatsElement = document.getElementById('availableSeats');
+              const checkInHistory = document.getElementById('checkInHistory');
+              
+              // ฟังก์ชันแสดงจำนวนที่นั่งที่ว่าง
+              function updateAvailableSeats() {
+                  let currentSeats = localStorage.getItem('availableSeats');
+                  availableSeatsElement.innerText = `จำนวนที่นั่งที่ว่าง: ${currentSeats} ที่นั่ง`;
+              }
+      
+              // ฟังก์ชันแสดงประวัติการเช็คอิน
+              function updateCheckInHistory() {
+                  const history = JSON.parse(localStorage.getItem('checkInHistory'));
+                  checkInHistory.innerHTML = ''; // ล้างประวัติที่แสดงอยู่ก่อน
+                  history.forEach(entry => {
+                      checkInHistory.innerHTML += `<li>${entry.action} เวลา: ${entry.timestamp}</li>`;
+                  });
+              }
+      
+              // ฟังก์ชันแสดงวันและเวลาปัจจุบัน
+              function updateDateTime() {
+                  const now = new Date();
+                  const formattedDateTime = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+                  document.getElementById('datetime').innerText = `วันที่และเวลา: ${formattedDateTime}`;
+              }
+      
+              // เมื่อหน้าโหลดแสดงจำนวนที่นั่งที่เหลือ ประวัติ และวันที่
+              window.onload = function() {
+                  updateAvailableSeats();
+                  updateCheckInHistory();
+                  updateDateTime();
+                  setInterval(updateDateTime, 1000);  // อัปเดตเวลาทุกๆ วินาที
+      
+                  // เช็คอินเมื่อเปิดหน้าเว็บ (การสแกน QR)
+                  checkIn();
+              };
+      
+              // ฟังก์ชันเช็คอิน (ลดจำนวนที่นั่ง 1)
+              function checkIn() {
+                  let currentSeats = parseInt(localStorage.getItem('availableSeats'));
+                  if (currentSeats > 0) {
+                      localStorage.setItem('availableSeats', currentSeats - 1);
+                      updateAvailableSeats();
+                      addCheckInHistory("เช็คอิน");
+                      updateCheckInHistory();
+                  } else {
+                      alert('ที่นั่งเต็มแล้ว');
+                  }
+              }
+      
+              // ฟังก์ชันเช็คเอาท์ (เพิ่มจำนวนที่นั่ง 1)
+              function checkOut() {
+                  let hasCheckedOut = localStorage.getItem('hasCheckedOut');
+                  let currentSeats = parseInt(localStorage.getItem('availableSeats'));
+      
+                  if (hasCheckedOut === 'false' && currentSeats < maxSeats) {
+                      localStorage.setItem('availableSeats', currentSeats + 1);
+                      localStorage.setItem('hasCheckedOut', 'true');
+                      addCheckInHistory("ลงจากรถ");
+                      updateAvailableSeats();
+                      updateCheckInHistory();
+                  } else if (hasCheckedOut === 'true') {
+                      alert('คุณได้ลงจากรถแล้ว ไม่สามารถลงได้อีก');
+                  }
+              }
+      
+              // ฟังก์ชันเพิ่มประวัติการเช็คอิน/เช็คเอาท์
+              function addCheckInHistory(action) {
+                  const now = new Date();
+                  const timestamp = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+                  let history = JSON.parse(localStorage.getItem('checkInHistory'));
+                  history.push({ action, timestamp });
+                  localStorage.setItem('checkInHistory', JSON.stringify(history));
+              }
+      
+              // ปุ่มกดลงจากรถ
+              document.getElementById('checkOutButton').addEventListener('click', checkOut);
+      
+          </script>
+      </body>
+      </html>
+      
